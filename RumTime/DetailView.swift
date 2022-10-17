@@ -15,7 +15,7 @@ struct DetailView: View {
     @State private var isPresentingEditView = false
     @State private var isPresentingTimerView = false
     @State private var isPresentingScoreView = false
-    @StateObject var gameTimer = GameTimer()
+    @StateObject var gameTimer = RoundTimer()
     let saveAction: ()->Void
     
     

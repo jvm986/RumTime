@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RoundTimerView: View {
     @Binding var game: Game
-    @StateObject var gameTimer: GameTimer
+    @StateObject var gameTimer: RoundTimer
     
     var body: some View {
         ZStack {
@@ -46,6 +46,6 @@ struct RoundTimerView: View {
 
 struct RoundTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        RoundTimerView(game: .constant(Game.sampleData[0]), gameTimer: GameTimer())
+        RoundTimerView(game: .constant(Game.sampleData[0]), gameTimer: RoundTimer())
     }
 }

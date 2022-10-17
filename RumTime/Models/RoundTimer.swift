@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-class GameTimer: ObservableObject {
+class RoundTimer: ObservableObject {
     struct Player: Identifiable {
         let id = UUID()
         let name: String
@@ -146,16 +146,16 @@ class GameTimer: ObservableObject {
 }
 
 extension Game {
-    var timer: GameTimer {
-        GameTimer(startingTime: startingTime, turnBonus: turnBonus, players: players)
+    var timer: RoundTimer {
+        RoundTimer(startingTime: startingTime, turnBonus: turnBonus, players: players)
     }
 }
 
 extension Array where Element == Game.Player {
-    var players: [GameTimer.Player] {
+    var players: [RoundTimer.Player] {
         if isEmpty {
-            return [GameTimer.Player(name: "Player 1", theme: .seafoam, secondsRemaining: 0)]
+            return [RoundTimer.Player(name: "Player 1", theme: .seafoam, secondsRemaining: 0)]
         }
-        return map { GameTimer.Player(name: $0.name, theme: $0.theme, secondsRemaining: 0)}
+        return map { RoundTimer.Player(name: $0.name, theme: $0.theme, secondsRemaining: 0)}
     }
 }

@@ -17,7 +17,8 @@ class RoundTimer: ObservableObject {
     }
     
     @Published var turn = 1
-    @Published var isPaused = false
+    @Published var isPaused = true
+    @Published var isActive = false
     @Published var isShowingAlert = false
     @Published var nextPlayer: String
     @Published var activePlayer: String
@@ -56,18 +57,21 @@ class RoundTimer: ObservableObject {
         self.activeTheme = Theme.seafoam
     }
     
-    func startGame() {
+    func startRound() {
         runTimer()
     }
     
-    func stopGame() {
+    func stopRound() {
         timer?.invalidate()
         timer = nil
+        avPlayer.pause()
+        isActive = false
     }
     
     func endTurn() {
         timer?.invalidate()
         timer = nil
+        avPlayer.pause()
         players[activePlayerIndex].secondsRemaining -= secondsElapsedForTurn
         if players[activePlayerIndex].secondsRemaining > 0 {
             players[activePlayerIndex].secondsRemaining += Double(turnBonus)
@@ -80,6 +84,8 @@ class RoundTimer: ObservableObject {
     
     private func runTimer() {
         startDate = Date()
+        isPaused = false
+        isActive = true
         timer = Timer.scheduledTimer(withTimeInterval: frequency, repeats: true) { [weak self] timer in
             if let self = self, let startDate = self.startDate {
                 let secondsElapsed = Date().timeIntervalSince1970 - startDate.timeIntervalSince1970
@@ -108,7 +114,7 @@ class RoundTimer: ObservableObject {
             avPlayer.pause()
             players[activePlayerIndex].secondsRemaining = 0
             secondsElapsedForTurn = 0
-            pauseGame()
+            pauseRound()
             isShowingAlert = true
         } else if players[activePlayerIndex].secondsRemaining - secondsElapsedForTurn <= 5 {
             if avPlayer.timeControlStatus != .playing {
@@ -118,12 +124,13 @@ class RoundTimer: ObservableObject {
         }
     }
     
-    func pauseGame() {
+    func pauseRound() {
         isPaused = true
         players[activePlayerIndex].secondsRemaining -= secondsElapsedForTurn
         secondsElapsedForTurn = 0
         timer?.invalidate()
         timer = nil
+        avPlayer.pause()
     }
     
     func unpauseGame() {
@@ -131,11 +138,16 @@ class RoundTimer: ObservableObject {
         runTimer()
     }
     
-    func reset(startingTime: Int, turnBonus: Int, players: [Game.Player]) {
-        isPaused = false
-        activePlayer = players[0].name
-        activeTheme = players[0].theme
-        nextPlayer = players[1].name
+    func reset(startingTime: Int, turnBonus: Int, players: [Game.Player], starter: Int) {
+        isPaused = true
+        isActive = false
+        activePlayer = players[starter].name
+        activeTheme = players[starter].theme
+        if starter + 1 >= players.count {
+            nextPlayer = players[0].name
+        } else {
+            nextPlayer = players[starter + 1].name
+        }
         self.startingTime = startingTime
         self.turnBonus = turnBonus
         self.players = players.players

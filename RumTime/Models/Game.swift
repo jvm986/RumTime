@@ -14,13 +14,15 @@ struct Game: Identifiable, Codable {
     var turnBonus: Int
     var players: [Player]
     var rounds: [Round] = []
+    var starter: Int
     
-    init(id: UUID = UUID(), name: String, startingTime: Int, turnBonus: Int, players: [Player]) {
+    init(id: UUID = UUID(), name: String, startingTime: Int, turnBonus: Int, players: [Player], starter: Int = 0) {
         self.id = id
         self.name = name
         self.startingTime = startingTime
         self.turnBonus = turnBonus
         self.players = players
+        self.starter = starter
     }
     
     var startingTimeMinutes: Int {
@@ -61,21 +63,23 @@ extension Game {
     
     struct Data {
         var name: String = ""
-        var startingTimeMinutes: Double = 0
+        var startingTime: Double = 0
         var turnBonus: Double = 0
         var players: [Player] = []
         var theme: Theme = .seafoam
+        var starter = 0
     }
     
     var data: Data {
-        Data(name: name, startingTimeMinutes: Double(startingTime / 60), turnBonus: Double(turnBonus), players: players)
+        Data(name: name, startingTime: Double(startingTime), turnBonus: Double(turnBonus), players: players, starter: starter)
     }
     
     mutating func update(from data: Data) {
         name =  data.name
-        startingTime = Int(data.startingTimeMinutes * 60)
+        startingTime = Int(data.startingTime)
         turnBonus = Int(data.turnBonus)
         players = data.players
+        starter = data.starter
     }
     
     mutating func addRound(from round: Round.Data) {
@@ -93,14 +97,22 @@ extension Game {
         }
         
         rounds.append(Round(date: round.date, scores: newScores))
+        
+        if starter + 1 >= players.count {
+            starter = 0
+        } else {
+            starter += 1
+        }
+        
     }
     
     init(data: Data) {
         id = UUID()
         name = data.name
-        startingTime = Int(data.startingTimeMinutes * 60)
+        startingTime = Int(data.startingTime)
         turnBonus = Int(data.turnBonus)
         players = data.players
+        starter = data.starter
     }
     
 }

@@ -9,35 +9,35 @@ import SwiftUI
 
 struct RoundTimerView: View {
     @Binding var game: Game
-    @StateObject var gameTimer: RoundTimer
+    @StateObject var roundTimer: RoundTimer
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
-                .fill(gameTimer.secondsRemainingForTurn > 10 ? gameTimer.activeTheme.mainColor: .red)
+                .fill(roundTimer.secondsRemainingForTurn > 10 ? roundTimer.activeTheme.mainColor: .red)
             VStack {
                 GameTimerView(
-                    turn: gameTimer.turn,
-                    startingTime: gameTimer.startingTime,
-                    timeRemaining: gameTimer.secondsRemainingForTurn,
-                    currentPlayer: gameTimer.activePlayer,
-                    theme: gameTimer.activeTheme
+                    turn: roundTimer.turn,
+                    startingTime: roundTimer.startingTime,
+                    timeRemaining: roundTimer.secondsRemainingForTurn,
+                    currentPlayer: roundTimer.activePlayer,
+                    theme: roundTimer.activeTheme
                 )
-                    .onTapGesture {
-                        gameTimer.endTurn()
-                    }
-                    .padding(.horizontal)
+                .padding(.horizontal)
                 GameFooterView(
-                    turn: gameTimer.turn,
-                    nextPlayer: gameTimer.nextPlayer,
-                    theme: gameTimer.activeTheme
+                    turn: roundTimer.turn,
+                    nextPlayer: roundTimer.nextPlayer,
+                    theme: roundTimer.activeTheme
                 )
             }
             .padding(.top)
         }
-        .alert("\(gameTimer.activePlayer) pick up 3!", isPresented: $gameTimer.isShowingAlert) {
+        .onTapGesture {
+            roundTimer.endTurn()
+        }
+        .alert("\(roundTimer.activePlayer) pick up 3!", isPresented: $roundTimer.isShowingAlert) {
             Button("OK", role: .cancel) {
-                gameTimer.endTurn()
+                roundTimer.endTurn()
             }
         }
         .padding()
@@ -47,6 +47,6 @@ struct RoundTimerView: View {
 
 struct RoundTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        RoundTimerView(game: .constant(Game.sampleData[0]), gameTimer: RoundTimer())
+        RoundTimerView(game: .constant(Game.sampleData[0]), roundTimer: RoundTimer())
     }
 }

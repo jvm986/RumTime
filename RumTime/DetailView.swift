@@ -13,19 +13,17 @@ struct DetailView: View {
     @State private var gameData = Game.Data()
     @State private var roundData = Round.Data()
     @State private var isPresentingEditView = false
-    @State private var isPresentingTimerView = false
     @State private var isPresentingScoreView = false
-    @StateObject var gameTimer = RoundTimer()
+    @StateObject var roundTimer = RoundTimer()
     let saveAction: ()->Void
     
     
     var body: some View {
         List {
             Section(header: Text("Game Settings")) {
-                if gameTimer.isPaused {
+                if roundTimer.isActive {
                     Button {
-                        isPresentingTimerView = true
-                        gameTimer.unpauseGame()
+                        roundTimer.unpauseGame()
                     } label: {
                         Label("Resume Round", systemImage: "timer")
                             .font(.headline)
@@ -33,9 +31,8 @@ struct DetailView: View {
                     }
                 } else {
                     Button {
-                        isPresentingTimerView = true
-                        gameTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players)
-                        gameTimer.startGame()
+                        roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players, starter: game.starter)
+                        roundTimer.startRound()
                     } label: {
                         Label("Start Round", systemImage: "timer")
                             .font(.headline)
@@ -108,24 +105,22 @@ struct DetailView: View {
                     }
             }
         }
-        .sheet(isPresented: $isPresentingTimerView) {
+        .sheet(isPresented: $roundTimer.isPaused.not) {
             NavigationView {
-                RoundTimerView(game: $game, gameTimer: gameTimer)
+                RoundTimerView(game: $game, roundTimer: roundTimer)
                     .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
                     .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
-                    .navigationTitle(gameTimer.activePlayer)
+                    .navigationTitle(roundTimer.activePlayer)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Pause") {
-                                gameTimer.pauseGame()
-                                isPresentingTimerView = false
+                                roundTimer.pauseRound()
                             }
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("End") {
                                 roundData.scores = game.scores
-                                gameTimer.pauseGame()
-                                isPresentingTimerView = false
+                                roundTimer.pauseRound()
                                 isPresentingScoreView = true
                             }
                         }
@@ -143,7 +138,7 @@ struct DetailView: View {
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Record") {
-                                gameTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players)
+                                roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players, starter: game.starter)
                                 game.addRound(from: roundData)
                                 isPresentingScoreView = false
                                 saveAction()
@@ -154,8 +149,7 @@ struct DetailView: View {
         }
         .onChange(of: scenePhase) { phase in
             if phase == .inactive {
-                isPresentingTimerView = false
-                gameTimer.pauseGame()
+                roundTimer.pauseRound()
             }
         }
     }

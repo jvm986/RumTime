@@ -28,6 +28,7 @@
 		61B3080D28F9D64000060491 /* GameCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B3080C28F9D64000060491 /* GameCardView.swift */; };
 		61B3080F28F9D6B700060491 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B3080E28F9D6B700060491 /* Theme.swift */; };
 		61B3081128F9D83600060491 /* Round.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B3081028F9D83600060491 /* Round.swift */; };
+		61C58E9D28FDE1AE0093E623 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C58E9C28FDE1AE0093E623 /* Helpers.swift */; };
 		61C8801228EAF0F8006494AF /* RumTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C8801128EAF0F8006494AF /* RumTimeApp.swift */; };
 		61C8801628EAF0FA006494AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 61C8801528EAF0FA006494AF /* Assets.xcassets */; };
 		61C8801928EAF0FA006494AF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 61C8801828EAF0FA006494AF /* Preview Assets.xcassets */; };
@@ -56,6 +57,7 @@
 		61B3080C28F9D64000060491 /* GameCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCardView.swift; sourceTree = "<group>"; };
 		61B3080E28F9D6B700060491 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		61B3081028F9D83600060491 /* Round.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Round.swift; sourceTree = "<group>"; };
+		61C58E9C28FDE1AE0093E623 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		61C8800E28EAF0F8006494AF /* RumTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RumTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		61C8801128EAF0F8006494AF /* RumTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RumTimeApp.swift; sourceTree = "<group>"; };
 		61C8801528EAF0FA006494AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				611893E628F1D470005B0A7D /* RoundTimer.swift */,
 				61B3081028F9D83600060491 /* Round.swift */,
 				61B3080E28F9D6B700060491 /* Theme.swift */,
+				61C58E9C28FDE1AE0093E623 /* Helpers.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 				61B0CA9B28F9E34200EB0140 /* ThemePicker.swift in Sources */,
 				61B3080D28F9D64000060491 /* GameCardView.swift in Sources */,
 				611893E528F1D2F4005B0A7D /* Game.swift in Sources */,
+				61C58E9D28FDE1AE0093E623 /* Helpers.swift in Sources */,
 				61B3080728F93BAB00060491 /* DetailView.swift in Sources */,
 				61B0CA9728F9DFEA00EB0140 /* ErrorView.swift in Sources */,
 				611893E728F1D470005B0A7D /* RoundTimer.swift in Sources */,

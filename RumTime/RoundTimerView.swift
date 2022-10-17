@@ -41,6 +41,7 @@ struct RoundTimerView: View {
             }
         }
         .padding()
+        .interactiveDismissDisabled()
     }
 }
 

@@ -24,17 +24,38 @@ extension Round {
         let id: UUID
         let player: Game.Player
         var score: Int
-
-        init(id: UUID = UUID(), player: Game.Player, score: Int) {
+        var isWinner: Bool
+        
+        init(id: UUID = UUID(), player: Game.Player, score: Int, isWinner: Bool = false) {
             self.id = id
             self.player = player
             self.score = score
+            self.isWinner = isWinner
         }
     }
     
     struct Data {
         var date: Date = Date()
         var scores: [Score] = []
+                
+        mutating func setWinner(id: UUID) {
+            for (i, s) in scores.enumerated() {
+                if id == s.player.id {
+                    scores[i].isWinner = true
+                    scores[i].score = 0
+                } else {
+                    scores[i].isWinner = false
+                    scores[i].score = 1
+                }
+            }
+        }
+        
+        var winner: Score {
+            if let i = scores.firstIndex(where: { $0.isWinner }) {
+                return scores[i]
+            }
+            return scores[0]
+        }
     }
     
     var data: Data {
@@ -45,6 +66,13 @@ extension Round {
         id = UUID()
         date = data.date
         scores = data.scores
+    }
+    
+    var winner: Score {
+        if let i = scores.firstIndex(where: { $0.isWinner }) {
+            return scores[i]
+        }
+        return scores[0]
     }
 }
 
@@ -68,6 +96,6 @@ extension Array where Element == Game.Player {
 extension Round {
     static let sampleData: [Round] =
     [
-        Round(scores: [Score(player: Game.Player(name: "James", theme: .seafoam), score: 10)])
+        Round(scores: [Score(player: Game.Player(name: "James", theme: .grapecompote), score: 10), Score(player: Game.Player(name: "Mark", theme: .grapecompote), score: 10, isWinner: true)])
     ]
 }

@@ -9,24 +9,41 @@ import SwiftUI
 
 struct DetailEditView: View {
     @Binding var data: Game.Data
+    @StateObject var roundTimer: RoundTimer
     @State private var newPlayerName = ""
-    @State private var newPlayerTheme = Theme.seafoam
     
     func move(from source: IndexSet, to destination: Int) {
         data.players.move(fromOffsets: source, toOffset: destination)
-    }
-    
-    var minutes: Int {
-        Int(data.startingTime) / 60 % 60
-    }
-
-    var seconds: Int {
-        Int(data.startingTime) % 60
+        data.starter = 0
+        roundTimer.reset(startingTime: Int(data.startingTime), turnBonus: Int(data.turnBonus), players: data.players, starter: 0)
     }
 
     
     var body: some View {
         Form {
+            Section(header: Text("Players")) {
+                ForEach($data.players) { $player in
+                    Text(player.name)
+                }
+                .onDelete { indices in
+                    data.players.remove(atOffsets: indices)
+                }
+                .onMove(perform: move)
+                HStack {
+                    TextField("New Player", text: $newPlayerName)
+                    Button(action: {
+                        withAnimation {
+                            let player = Game.Player(name: newPlayerName, theme: data.randomTheme)
+                            data.players.append(player)
+                            newPlayerName = ""
+                        }
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .accessibilityLabel("Add player")
+                    }
+                    .disabled(newPlayerName.isEmpty)
+                }
+            }
             Section(header: Text("Game Info")) {
                 TextField("Title", text: $data.name)
                 HStack {
@@ -35,7 +52,7 @@ struct DetailEditView: View {
                         Text("Starting Time")
                     }
                     Spacer()
-                    Text(String(format: "%02i:%02i", minutes, seconds))
+                    Text(String(format: "%02i:%02i", Int(data.startingTime) / 60 % 60, Int(data.startingTime) % 60))
                         .accessibilityHidden(true)
                 }
                 HStack {
@@ -49,35 +66,12 @@ struct DetailEditView: View {
                         .accessibilityHidden(true)
                 }
             }
-            Section(header: Text("Players")) {
-                ForEach($data.players) { $player in
-                    ThemePicker(title: player.name, selection: $player.theme)
-                }
-                .onDelete { indices in
-                    data.players.remove(atOffsets: indices)
-                }
-                .onMove(perform: move)
-                HStack {
-                    TextField("New Player", text: $newPlayerName)
-                    Button(action: {
-                        withAnimation {
-                            let player = Game.Player(name: newPlayerName, theme: newPlayerTheme)
-                            data.players.append(player)
-                            newPlayerName = ""
-                        }
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .accessibilityLabel("Add player")
-                    }
-                    .disabled(newPlayerName.isEmpty)
-                }
-            }
         }
     }
 }
 
 struct DetailEditView_Previews: PreviewProvider {
     static var previews: some View {
-        DetailEditView(data: .constant(Game.sampleData[1].data))
+        DetailEditView(data: .constant(Game.sampleData[1].data), roundTimer: RoundTimer())
     }
 }

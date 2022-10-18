@@ -20,7 +20,7 @@ struct GameCardView: View {
                 Label("\(game.players.count)", systemImage: "person.3")
                     .accessibilityLabel("\(game.players.count) players")
                 Spacer()
-                Label("\(game.startingTimeMinutes)", systemImage: "clock")
+                Label("\(game.startingTimeString)", systemImage: "clock")
                     .accessibilityLabel("\(game.startingTime) starting time")
             }
             .font(.caption)

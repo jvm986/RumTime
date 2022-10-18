@@ -10,7 +10,7 @@ import AVFoundation
 
 class RoundTimer: ObservableObject {
     struct Player: Identifiable {
-        let id = UUID()
+        let id: UUID
         let name: String
         let theme: Theme
         var secondsRemaining: Double
@@ -22,6 +22,7 @@ class RoundTimer: ObservableObject {
     @Published var isShowingAlert = false
     @Published var nextPlayer: String
     @Published var activePlayer: String
+    @Published var activePlayerObj: Player
     @Published var activeTheme: Theme
     @Published var secondsRemainingForTurn: Double = 0
     
@@ -41,7 +42,6 @@ class RoundTimer: ObservableObject {
             return activePlayerIndex + 1
         }
         return 0
-        
     }
     
     private var avPlayer: AVPlayer { AVPlayer.sharedAlarmPlayer }
@@ -53,8 +53,9 @@ class RoundTimer: ObservableObject {
         self.turnBonus = turnBonus
         self.players = players.players
         self.activePlayer = "Active Player"
+        self.activePlayerObj = Player(id: UUID(), name: "Active Player", theme: .chive, secondsRemaining: 0)
         self.nextPlayer = "Next Player"
-        self.activeTheme = Theme.seafoam
+        self.activeTheme = Theme.chive
     }
     
     func startRound() {
@@ -101,6 +102,7 @@ class RoundTimer: ObservableObject {
 
         activePlayerIndex = nextPlayerIndex
         activePlayer = players[activePlayerIndex].name
+        activePlayerObj = players[activePlayerIndex]
         activeTheme = players[activePlayerIndex].theme
         
         nextPlayer = players[nextPlayerIndex].name
@@ -114,7 +116,8 @@ class RoundTimer: ObservableObject {
             avPlayer.pause()
             players[activePlayerIndex].secondsRemaining = 0
             secondsElapsedForTurn = 0
-            pauseRound()
+            timer?.invalidate()
+            timer = nil
             isShowingAlert = true
         } else if players[activePlayerIndex].secondsRemaining - secondsElapsedForTurn <= 5 {
             if avPlayer.timeControlStatus != .playing {
@@ -141,7 +144,9 @@ class RoundTimer: ObservableObject {
     func reset(startingTime: Int, turnBonus: Int, players: [Game.Player], starter: Int) {
         isPaused = true
         isActive = false
+        activePlayerIndex = starter
         activePlayer = players[starter].name
+        activePlayerObj = RoundTimer.Player(id: players[starter].id, name: players[starter].name, theme: players[starter].theme, secondsRemaining: 0)
         activeTheme = players[starter].theme
         if starter + 1 >= players.count {
             nextPlayer = players[0].name
@@ -166,8 +171,8 @@ extension Game {
 extension Array where Element == Game.Player {
     var players: [RoundTimer.Player] {
         if isEmpty {
-            return [RoundTimer.Player(name: "Player 1", theme: .seafoam, secondsRemaining: 0)]
+            return [RoundTimer.Player(id: UUID(), name: "Player 1", theme: .chive, secondsRemaining: 0)]
         }
-        return map { RoundTimer.Player(name: $0.name, theme: $0.theme, secondsRemaining: 0)}
+        return map { RoundTimer.Player(id: $0.id, name: $0.name, theme: $0.theme, secondsRemaining: 0)}
     }
 }

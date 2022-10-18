@@ -38,7 +38,7 @@ struct GamesView: View {
         }
         .sheet(isPresented: $isPresentingNewGameView) {
             NavigationView {
-                DetailEditView(data: $newGameData)
+                DetailEditView(data: $newGameData, roundTimer: RoundTimer())
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Dismiss") {

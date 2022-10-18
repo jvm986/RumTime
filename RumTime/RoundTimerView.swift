@@ -27,7 +27,8 @@ struct RoundTimerView: View {
                 GameFooterView(
                     turn: roundTimer.turn,
                     nextPlayer: roundTimer.nextPlayer,
-                    theme: roundTimer.activeTheme
+                    theme: roundTimer.activeTheme,
+                    timeRemaining: roundTimer.secondsRemainingForTurn
                 )
             }
             .padding(.top)

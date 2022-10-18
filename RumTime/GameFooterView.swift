@@ -11,6 +11,7 @@ struct GameFooterView: View {
     let turn: Int
     let nextPlayer: String
     let theme: Theme
+    let timeRemaining: Double
     
     private var turnText: String {
         return "\(nextPlayer) is next"
@@ -19,7 +20,7 @@ struct GameFooterView: View {
     var body: some View {
         VStack {
                 Text(turnText)
-            .foregroundColor(theme.accentColor)
+            .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
         }
         .font(.title2)
         .padding([.bottom, .horizontal])
@@ -31,7 +32,8 @@ struct GameFooterView_Previews: PreviewProvider {
         GameFooterView(
             turn: 1,
             nextPlayer: Game.sampleData[0].players[0].name,
-            theme: Theme.seafoam
+            theme: Theme.chive,
+            timeRemaining: 12
         )
     }
 }

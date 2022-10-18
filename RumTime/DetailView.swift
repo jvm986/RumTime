@@ -25,7 +25,7 @@ struct DetailView: View {
                     Button {
                         roundTimer.unpauseGame()
                     } label: {
-                        Label("Resume Round", systemImage: "timer")
+                        Label("Resume Round (\(roundTimer.activePlayer))", systemImage: "timer")
                             .font(.headline)
                             .foregroundColor(.accentColor)
                     }
@@ -34,7 +34,7 @@ struct DetailView: View {
                         roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players, starter: game.starter)
                         roundTimer.startRound()
                     } label: {
-                        Label("Start Round", systemImage: "timer")
+                        Label("Start Round (\(game.players[game.starter].name))", systemImage: "timer")
                             .font(.headline)
                             .foregroundColor(.accentColor)
                     }
@@ -42,7 +42,7 @@ struct DetailView: View {
                 HStack {
                     Label("Starting Time", systemImage: "clock")
                     Spacer()
-                    Text("\(game.startingTimeMinutes) minutes")
+                    Text("\(game.startingTimeString)")
                 }
                 HStack {
                     Label("Turn Bonus", systemImage: "goforward.plus")
@@ -51,9 +51,9 @@ struct DetailView: View {
                 }
             }
             Section(header: Text("Players")) {
-                ForEach(game.sortedPlayers) { player in
+                ForEach($game.players) { $player in
                     HStack {
-                        Label(player.name, systemImage: "person")
+                        Label(player.name, systemImage: player.isPaused ? "person.badge.clock" : "person")
                         Spacer()
                         Text("\(player.totalScore(rounds: game.rounds)) points")
                     }
@@ -69,7 +69,9 @@ struct DetailView: View {
                 ForEach(game.rounds) { round in
                     HStack {
                         Image(systemName: "calendar")
-                        Text(round.date, style: .time)
+                        Text(round.date.formatted())
+                        Spacer()
+                        Label(round.winner.player.name, systemImage: "rosette")
                     }
                 }
                 .onDelete { indices in
@@ -87,7 +89,7 @@ struct DetailView: View {
         }
         .sheet(isPresented: $isPresentingEditView) {
             NavigationView {
-                DetailEditView(data: $gameData)
+                DetailEditView(data: $gameData, roundTimer: roundTimer)
                     .navigationTitle(game.name)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
@@ -120,6 +122,7 @@ struct DetailView: View {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("End") {
                                 roundData.scores = game.scores
+                                roundData.setWinner(id: roundTimer.activePlayerObj.id)
                                 roundTimer.pauseRound()
                                 isPresentingScoreView = true
                             }

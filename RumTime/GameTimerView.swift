@@ -38,7 +38,7 @@ struct GameView_Previews: PreviewProvider {
             startingTime: 300,
             timeRemaining: 300,
             currentPlayer: "Wade Watts",
-            theme: Theme.seafoam
+            theme: Theme.chive
         )
     }
 }

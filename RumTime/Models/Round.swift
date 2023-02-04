@@ -79,7 +79,7 @@ extension Round {
 extension Game {
     var scores: [Round.Score] {
         var newScores: [Round.Score] = []
-        players.forEach { newScores.insert(Round.Score(player: $0, score: 0), at: 0) }
+        unpausedPlayers.forEach { newScores.insert(Round.Score(player: $0, score: 0), at: 0) }
         return newScores
     }
 }

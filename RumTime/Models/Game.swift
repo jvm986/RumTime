@@ -29,6 +29,19 @@ struct Game: Identifiable, Codable {
     var startingTimeString: String {
         String(format: "%02i:%02i", startingTime / 60 % 60, startingTime % 60)
     }
+    
+    var unpausedStarter: Int {
+        for (idx, p) in players.enumerated() {
+            if idx == starter {
+                for (idx, up) in unpausedPlayers.enumerated() {
+                    if p.id == up.id {
+                        return idx
+                    }
+                }
+            }
+        }
+        return 0
+    }
 }
 
 extension Game {
@@ -59,8 +72,17 @@ extension Game {
     }
     
     var sortedPlayers: [Player] {
-        players.sorted {
-            $0.totalScore(rounds: rounds) > $1.totalScore(rounds: rounds)
+        get {
+            players.sorted(by: { $0.totalScore(rounds: rounds) > $1.totalScore(rounds: rounds) })
+        }
+        set {
+            players = newValue
+        }
+    }
+    
+    var unpausedPlayers: [Player] {
+        get {
+            players.filter({ !$0.isPaused })
         }
     }
     
@@ -107,19 +129,34 @@ extension Game {
         }
         
         for (idx, score) in newScores.enumerated() {
-            if score.score == 0 {
+            if score.isWinner {
                 newScores[idx].score = total
             }
         }
         
         rounds.insert(Round(date: round.date, scores: newScores), at: 0)
-        
-        if starter + 1 >= players.count {
-            starter = 0
-        } else {
-            starter += 1
+        starter = nextUnpausedPlayer(players: players, current: starter)
+    }
+    
+    mutating func togglePausedPlayer(id: UUID) {
+        // We don't want to pause a player if it means there will be less
+        // than 2 players left
+        if players.filter({ !$0.isPaused }).count < 3 {
+            for (idx, p) in players.enumerated() {
+                if p.id == id {
+                    players[idx].isPaused = false
+                    return
+                }
+            }
         }
-        
+        for (idx, p) in players.enumerated() {
+            if p.id == id {
+                players[idx].isPaused.toggle()
+                if idx == starter {
+                    starter = nextUnpausedPlayer(players: players, current: starter)
+                }
+            }
+        }
     }
     
     init(data: Data) {
@@ -165,4 +202,18 @@ extension Game {
             ]
         )
     ]
+}
+
+func nextUnpausedPlayer(players: [Game.Player], current: Int) -> Int {
+    for (idx, player) in players.enumerated() {
+        if !player.isPaused && idx > current {
+            return idx
+        }
+        if !player.isPaused && idx + 1 > players.count {
+            if let new = players.firstIndex(where: { !$0.isPaused }) {
+                return new
+            }
+        }
+    }
+    return 0
 }

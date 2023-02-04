@@ -31,10 +31,10 @@ struct DetailView: View {
                     }
                 } else {
                     Button {
-                        roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players, starter: game.starter)
+                        roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
                         roundTimer.startRound()
                     } label: {
-                        Label("Start Round (\(game.players[game.starter].name))", systemImage: "timer")
+                        Label("Start Round (\(game.unpausedPlayers[game.unpausedStarter].name))", systemImage: "timer")
                             .font(.headline)
                             .foregroundColor(.accentColor)
                     }
@@ -51,9 +51,15 @@ struct DetailView: View {
                 }
             }
             Section(header: Text("Players")) {
-                ForEach($game.players) { $player in
+                ForEach($game.sortedPlayers) { $player in
                     HStack {
                         Label(player.name, systemImage: player.isPaused ? "person.badge.clock" : "person")
+                            .onTapGesture {
+                                if !roundTimer.isActive {
+                                    game.togglePausedPlayer(id: player.id)
+                                    roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
+                                }
+                            }
                         Spacer()
                         Text("\(player.totalScore(rounds: game.rounds)) points")
                     }
@@ -103,6 +109,7 @@ struct DetailView: View {
                                 game.update(from: gameData)
                                 saveAction()
                             }
+                            .disabled(gameData.players.count < 2 || gameData.name == "" || gameData.startingTime <= 0)
                         }
                     }
             }
@@ -141,7 +148,7 @@ struct DetailView: View {
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Record") {
-                                roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.players, starter: game.starter)
+                                roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
                                 game.addRound(from: roundData)
                                 isPresentingScoreView = false
                                 saveAction()

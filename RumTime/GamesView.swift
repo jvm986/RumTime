@@ -54,6 +54,7 @@ struct GamesView: View {
                                 newGameData = Game.Data()
                                 saveAction()
                             }
+                            .disabled(newGameData.players.count < 2 || newGameData.name == "" || newGameData.startingTime <= 0)
                         }
                     }
             }

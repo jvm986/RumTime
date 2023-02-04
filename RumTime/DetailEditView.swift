@@ -21,6 +21,28 @@ struct DetailEditView: View {
     
     var body: some View {
         Form {
+            Section(header: Text("Game Info")) {
+                TextField("Title", text: $data.name)
+                HStack {
+                    Text("Start")
+                    Slider(value: $data.startingTime, in: 15...300, step: 15) {
+                        Text("Starting Time")
+                    }
+                    Spacer()
+                    Text(String(format: "%02i:%02i", Int(data.startingTime) / 60 % 60, Int(data.startingTime) % 60))
+                        .accessibilityHidden(true)
+                }
+                HStack {
+                    Text("Turn")
+                    Slider(value: $data.turnBonus, in: 1...30, step: 1) {
+                        Text("Turn Bonus")
+                    }
+                    .accessibilityValue("\(Int(data.turnBonus)) seconds")
+                    Spacer()
+                    Text("\(Int(data.turnBonus))s")
+                        .accessibilityHidden(true)
+                }
+            }
             Section(header: Text("Players")) {
                 ForEach($data.players) { $player in
                     Text(player.name)
@@ -42,28 +64,6 @@ struct DetailEditView: View {
                             .accessibilityLabel("Add player")
                     }
                     .disabled(newPlayerName.isEmpty)
-                }
-            }
-            Section(header: Text("Game Info")) {
-                TextField("Title", text: $data.name)
-                HStack {
-                    Text("Start")
-                    Slider(value: $data.startingTime, in: 15...300, step: 15) {
-                        Text("Starting Time")
-                    }
-                    Spacer()
-                    Text(String(format: "%02i:%02i", Int(data.startingTime) / 60 % 60, Int(data.startingTime) % 60))
-                        .accessibilityHidden(true)
-                }
-                HStack {
-                    Text("Turn")
-                    Slider(value: $data.turnBonus, in: 1...30, step: 1) {
-                        Text("Turn Bonus")
-                    }
-                    .accessibilityValue("\(Int(data.turnBonus)) seconds")
-                    Spacer()
-                    Text("\(Int(data.turnBonus))s")
-                        .accessibilityHidden(true)
                 }
             }
         }

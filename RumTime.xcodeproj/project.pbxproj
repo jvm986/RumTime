@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B7392DD2D0B22DB001AFBCC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B7392DC2D0B22DB001AFBCC /* LaunchScreen.storyboard */; };
 		611893E328F1D17D005B0A7D /* RoundTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611893E228F1D17D005B0A7D /* RoundTimerView.swift */; };
 		611893E528F1D2F4005B0A7D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611893E428F1D2F4005B0A7D /* Game.swift */; };
 		611893E728F1D470005B0A7D /* RoundTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611893E628F1D470005B0A7D /* RoundTimer.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4B7392DC2D0B22DB001AFBCC /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		611893E228F1D17D005B0A7D /* RoundTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundTimerView.swift; sourceTree = "<group>"; };
 		611893E428F1D2F4005B0A7D /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		611893E628F1D470005B0A7D /* RoundTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundTimer.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 		61C8800528EAF0F8006494AF = {
 			isa = PBXGroup;
 			children = (
+				4B7392DC2D0B22DB001AFBCC /* LaunchScreen.storyboard */,
 				61C8801028EAF0F8006494AF /* RumTime */,
 				61C8800F28EAF0F8006494AF /* Products */,
 			);
@@ -168,7 +171,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1400;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					61C8800D28EAF0F8006494AF = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -176,7 +179,6 @@
 				};
 			};
 			buildConfigurationList = 61C8800928EAF0F8006494AF /* Build configuration list for PBXProject "RumTime" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -184,6 +186,7 @@
 				Base,
 			);
 			mainGroup = 61C8800528EAF0F8006494AF;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 61C8800F28EAF0F8006494AF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -199,6 +202,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61C8801928EAF0FA006494AF /* Preview Assets.xcassets in Resources */,
+				4B7392DD2D0B22DB001AFBCC /* LaunchScreen.storyboard in Resources */,
 				61C8801628EAF0FA006494AF /* Assets.xcassets in Resources */,
 				6153E65428FBF61C005AABE2 /* alarm.wav in Resources */,
 			);
@@ -273,6 +277,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -333,6 +338,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -365,6 +371,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -375,7 +382,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.james-maguire.RumTime";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -394,6 +401,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -404,7 +412,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.james-maguire.RumTime";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

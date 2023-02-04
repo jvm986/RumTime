@@ -32,7 +32,7 @@ class GameStore: ObservableObject {
         }
     }
     
-    static func load(completion: @escaping (Result<[Game], Error>)->Void) {
+    static func load(completion: @escaping @Sendable (Result<[Game], Error>) -> Void) {
         DispatchQueue.global(qos: .background).async {
             do {
                 let fileURL = try fileURL()
@@ -68,7 +68,7 @@ class GameStore: ObservableObject {
         }
     }
     
-    static func save(games: [Game], completion: @escaping (Result<Int, Error>)->Void) {
+    static func save(games: [Game], completion: @escaping @Sendable (Result<Int, Error>) -> Void) {
         DispatchQueue.global(qos: .background).async {
             do {
                 let data = try JSONEncoder().encode(games)

@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 
+@MainActor
 class RoundTimer: ObservableObject {
     struct Player: Identifiable {
         let id: UUID
@@ -44,6 +45,7 @@ class RoundTimer: ObservableObject {
         return 0
     }
     
+    @MainActor
     private var avPlayer: AVPlayer { AVPlayer.sharedAlarmPlayer }
     
     private var startDate: Date?
@@ -84,13 +86,21 @@ class RoundTimer: ObservableObject {
     }
     
     private func runTimer() {
-        startDate = Date()
-        isPaused = false
-        isActive = true
+        Task { @MainActor in
+            startDate = Date()
+            isPaused = false
+            isActive = true
+        }
         timer = Timer.scheduledTimer(withTimeInterval: frequency, repeats: true) { [weak self] timer in
-            if let self = self, let startDate = self.startDate {
-                let secondsElapsed = Date().timeIntervalSince1970 - startDate.timeIntervalSince1970
-                self.update(secondsElapsed: Double(secondsElapsed))
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+            Task { @MainActor in
+                if let startDate = self.startDate {
+                    let secondsElapsed = Date().timeIntervalSince(startDate)
+                    self.update(secondsElapsed: secondsElapsed)
+                }
             }
         }
     }
@@ -163,6 +173,7 @@ class RoundTimer: ObservableObject {
 }
 
 extension Game {
+    @MainActor
     var timer: RoundTimer {
         RoundTimer(startingTime: startingTime, turnBonus: turnBonus, players: players)
     }

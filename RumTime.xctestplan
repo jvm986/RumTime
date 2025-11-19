@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "D3D9FC24-4F46-4217-9774-8AEF556A0BB9",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:RumTime.xcodeproj",
+      "identifier" : "4BF1AF6A2ECE60E90076BFD9",
+      "name" : "RumTime"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:RumTime.xcodeproj",
+        "identifier" : "4BF1AF7B2ECE60EA0076BFD9",
+        "name" : "RumTimeTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:RumTime.xcodeproj",
+        "identifier" : "4BF1AF852ECE60EA0076BFD9",
+        "name" : "RumTimeUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

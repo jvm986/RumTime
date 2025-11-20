@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct RumTimeApp: App {
+    @AppStorage("hasSeenWelcome") private var hasSeenWelcome: Bool = false
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Game.self,
@@ -28,8 +30,17 @@ struct RumTimeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationView {
+            NavigationStack {
                 GamesView()
+            }
+            .sheet(isPresented: Binding(
+                get: { !hasSeenWelcome },
+                set: { if !$0 { hasSeenWelcome = true } }
+            )) {
+                WelcomeView(isPresented: Binding(
+                    get: { !hasSeenWelcome },
+                    set: { if !$0 { hasSeenWelcome = true } }
+                ))
             }
         }
         .modelContainer(sharedModelContainer)

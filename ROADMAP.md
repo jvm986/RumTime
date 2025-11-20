@@ -2,16 +2,16 @@
 
 ## Project Status
 
-**Current Version:** 1.0 (Build 3)
-**Target:** App Store Release + Portfolio Showcase
+**Current Version:** 1.0
+**Target:** App Store Release (PRIORITY) + Portfolio Showcase
 **Started:** 2025-11-18
 **Major Migration:** Migrated to SwiftData (November 2025)
 
-### Overall Progress
+### Overall Progress (App Store Focus)
 - [x] Phase 1: Code Quality & Polish (5/5) - Complete
-- [ ] Phase 2: User Experience (0/4)
-- [ ] Phase 3: Legal & App Store Prep (0/3)
-- [ ] Phase 4: Portfolio Presentation (0/3)
+- [ ] Phase 2: App Store Essentials (3.5/5) - **IN PROGRESS** 🚀
+- [ ] Phase 3: Nice-to-Have UX Improvements (0/6) - Defer if needed
+- [ ] Phase 4: Future Enhancements (0/3) - Post-launch
 
 ---
 
@@ -79,178 +79,86 @@
 
 ---
 
-## Phase 2: User Experience (App Store Requirements)
+## Phase 2: App Store Essentials (CRITICAL PATH - Do First)
 
-### 2.1 Onboarding Flow
-- [ ] Design first-launch welcome screen
-- [ ] Create interactive tutorial
-- [ ] Add quick tips overlay for game setup
-- [ ] Include example game walkthrough
-- [ ] Add "What's New" screen for updates
-- [ ] Store onboarding completion flag
+### 2.1 Legal Requirements (REQUIRED) ✅
+- [x] Create privacy policy
+  - [x] Detail data collection (local storage only)
+  - [x] Explain data usage
+  - [x] User rights and data deletion
+- [x] Add privacy policy link to app
+- [ ] Review App Store Review Guidelines compliance
+- [x] Add required export compliance info (documented in APP_STORE_MATERIALS.md)
+- [x] Age rating assessment (documented in APP_STORE_MATERIALS.md)
 
-### 2.2 Help & Documentation
-- [ ] Create in-app help section
-- [ ] Add rule explanations for Rummy/Rummikub
-- [ ] Document timer mechanics
+### 2.2 App Store Assets (REQUIRED)
+- [x] Professional app icon (all sizes)
+- [x] Screenshots for required device sizes:
+  - [x] iPhone 6.5" (Plus)
+  - [x] iPad Pro 13" (6th gen)
+- [x] Compelling app description (APP_STORE_MATERIALS.md)
+  - [x] Clear value proposition
+  - [x] Feature list
+  - [x] Target audience
+- [x] Keywords research and optimization (APP_STORE_MATERIALS.md)
+- [x] Promotional text (170 chars) (APP_STORE_MATERIALS.md)
+- [x] Support URL (github.com/jvm986/RumTime)
+
+### 2.3 Basic Help/Onboarding (REQUIRED) ✅
+- [x] Design minimal first-launch welcome screen (WelcomeView.swift)
+- [x] Add simple in-app help section (HelpView.swift with basic Rummy rules)
+
+### 2.4 Critical UX Fixes (REQUIRED) ✅
+- [x] Add confirmation dialogs for destructive actions:
+  - [x] Deleting games (GamesView.swift:83-99)
+  - [x] Deleting rounds (DetailView.swift:248-262)
+- [x] Add Resume button to score view to return to round timer (DetailView.swift:226-229)
+
+### 2.5 Technical Validation (REQUIRED) ✅
+- [x] Test on multiple device sizes
+- [x] Test on different iOS versions (minimum supported)
+- [x] Performance testing (no crashes or major slowdowns)
+- [ ] Memory leak detection (pending Instruments run)
+- [x] Final build validation (all 33 tests passing)
+
+---
+
+## Phase 3: Nice-to-Have UX Improvements (Defer if Needed)
+
+### 3.1 Enhanced Documentation
+- [ ] Add detailed rule explanations for Rummy
+- [ ] Document timer mechanics in detail
 - [ ] Create FAQ for common issues
 - [ ] Add contextual help buttons
 - [ ] Include video tutorials or animated guides
 
-### 2.3 User Feedback Improvements
-- [ ] Add haptic feedback for:
-  - [ ] Timer start/end
-  - [ ] Turn switches
-  - [ ] Button presses
-  - [ ] Time running out warning
+### 3.2 UX Polish
 - [ ] Improve visual feedback for timer states
-- [ ] Add confirmation dialogs for:
-  - [ ] Deleting games
-  - [ ] Deleting rounds
-  - [ ] Ending rounds prematurely
 - [ ] Add undo functionality for accidental deletions
 - [ ] Improve loading indicators
-
-### 2.4 Feature Refinements
-- [x] Improve winner selection in ScoreView
-  - [x] Make winner selection more discoverable (currently tap-on-name is unclear)
-  - [x] Add visual affordance (picker, radio buttons, or selection indicator)
-  - [x] Consider Button style with clear interaction pattern
-- [x] Enhance player addition UX in DetailEditView
-  - [x] Add keyboard shortcut (Return/Enter) to add player
-  - [x] Keep plus button as backup for discoverability
-  - [x] Consider auto-focus after adding player
-- [x] Polish UI with rounded card styling
-  - [x] Applied consistent rounded corners to game cards, player cards, and rounds
-  - [x] Improved empty state with custom icon
-  - [x] Added floating action button for starting rounds
-- [ ] Multi-step game creation flow
-  - [ ] Step 1: Game name and optional description
-  - [ ] Step 2: Timer settings (starting time + turn bonus)
-  - [ ] Step 3: Add players
-  - [ ] Show progress indicator across steps
-  - [ ] Improve first-time user experience
-- [x] Add game duplication feature
-  - [x] Swipe action or context menu with "Duplicate" option
-  - [x] Copies game settings and player list
-  - [x] Useful for tournaments and repeat games
 - [ ] Add ability to edit existing rounds
-- [ ] Export game history (CSV, PDF, or share)
 - [ ] Customizable sound alerts
-  - [ ] Multiple alert sounds
   - [ ] Volume control
   - [ ] Option to disable
-- [ ] iPad-specific optimizations
-  - [ ] Multi-column layouts
-  - [ ] Split view support
-  - [ ] Keyboard shortcuts
+
+### 3.3 Optimization
 - [ ] Dark mode optimization
 - [ ] Landscape mode improvements
-- [ ] Add game statistics/analytics view
-
----
-
-## Phase 3: Legal & App Store Prep
-
-### 3.1 Legal Requirements
-- [ ] Create privacy policy
-  - [ ] Detail data collection (local storage only)
-  - [ ] Explain data usage
-  - [ ] User rights and data deletion
-- [ ] Add privacy policy link to app
-- [ ] Create terms of service (if needed)
-- [ ] Review App Store Review Guidelines compliance
-- [ ] Add required export compliance info
-- [ ] Age rating assessment
-
-### 3.2 App Store Assets
-- [ ] Professional app icon (all sizes)
-- [ ] Screenshots for all device sizes:
-  - [ ] iPhone 6.7" (Pro Max)
-  - [ ] iPhone 6.5" (Plus)
-  - [ ] iPhone 5.5" (older devices)
-  - [ ] iPad Pro 12.9" (6th gen)
-  - [ ] iPad Pro 12.9" (2nd gen)
-- [ ] App preview video (optional but recommended)
-  - [ ] 15-30 second demo
-  - [ ] Show key features
-- [ ] Compelling app description
-  - [ ] Clear value proposition
-  - [ ] Feature list
-  - [ ] Target audience
-- [ ] Keywords research and optimization
-- [ ] Promotional text (170 chars)
-- [ ] Support URL
-- [ ] Marketing URL (optional)
-
-### 3.3 Technical Preparation
-- [ ] Test on multiple device sizes
-- [ ] Test on different iOS versions (minimum supported)
-- [ ] Performance testing
-- [ ] Memory leak detection
 - [ ] Battery usage optimization
 - [ ] App size optimization
-- [ ] Create TestFlight beta program
-- [ ] Beta test with friends/family
 
 ---
 
-## Phase 4: Portfolio Presentation
+## Phase 4: Future Enhancements (Post-Launch)
 
-### 4.1 Documentation
-- [ ] Enhance README.md
-  - [ ] Add hero image/banner
-  - [ ] Feature highlights with screenshots
-  - [ ] Technology stack
-  - [ ] Installation instructions
-- [ ] Create ARCHITECTURE.md
-  - [ ] App architecture overview
-  - [ ] SwiftUI patterns used
-  - [ ] State management approach
-  - [ ] Data persistence strategy
-- [ ] Document development journey
-  - [ ] Technical decisions made
-  - [ ] Challenges overcome
-  - [ ] Performance optimizations
-  - [ ] Lessons learned
-- [ ] Add code comments for complex logic
-- [ ] Create API documentation (if applicable)
+### 4.1 Advanced Features
+- [ ] Add game statistics/analytics view
+- [ ] Terms of service (only if needed based on app functionality)
 
-### 4.2 Code Showcase
-- [ ] Highlight interesting technical solutions
-  - [ ] Custom timer implementation
-  - [ ] Turn-based state management
-  - [ ] Theme system
-- [ ] Document SwiftUI best practices
-- [ ] Explain architecture decisions
-- [ ] Show testing strategy
-- [ ] Add code examples to README
-- [ ] Create technical blog post (optional)
-
-### 4.3 CI/CD Setup
-- [ ] Set up GitHub Actions
-  - [ ] Run tests on push
-  - [ ] Build verification
-  - [ ] Code coverage reporting
-- [ ] Add code quality checks
-  - [ ] SwiftLint configuration
-  - [ ] Static analysis
-- [ ] Add status badges to README
-- [ ] Automated deployment to TestFlight (optional)
-- [ ] Automated release notes generation
-
----
-
-## Marketing & Launch Preparation
-
-### Optional Enhancements
-- [ ] Create landing page/website
-- [ ] Demo video for portfolio
-- [ ] Social media presence setup
-- [ ] Press kit preparation
-- [ ] App Store Optimization (ASO) research
-- [ ] Launch strategy planning
-- [ ] Community building (Discord, Reddit, etc.)
+### 4.2 Portfolio Presentation
+- [ ] Professional README with screenshots
+- [ ] Architecture documentation
+- [ ] Code samples highlighting best practices
 
 ---
 
@@ -259,20 +167,12 @@
 ### Feature Ideas for Future Versions
 - iCloud sync across devices
 - Multiplayer sync (turn notifications)
-- Apple Watch companion app
-- Widgets for active games
-- Game templates (Quick, Tournament, Custom)
 - Player profiles with avatars
 - Achievements/badges
-- Tournament mode with brackets
 - Custom themes creator
-- Sound pack marketplace
 
 ### Technical Debt
 - [ ] Review force unwrapping in codebase
-- [ ] Optimize asset sizes
-- [ ] Review and update dependencies
-- ~~[ ] Modernize deprecated APIs~~ ✅ Updated to iOS 26.1 with latest SwiftData patterns
 
 ### Migration History
 **SwiftData Migration (November 2025)**
@@ -290,30 +190,32 @@
 
 ---
 
-## Timeline Estimates
+## Revised Timeline (App Store Priority)
 
-- **Phase 1:** 1-2 weeks
-- **Phase 2:** 2-3 weeks
-- **Phase 3:** 1-2 weeks
-- **Phase 4:** 1 week
-- **Total Estimated Time:** 5-8 weeks (part-time)
+**FAST TRACK TO APP STORE:**
+- **Phase 1:** ✅ Complete
+- **Phase 2 (App Store Essentials):** 1-2 weeks - **DO THIS NOW**
+  - Legal/Assets: 3-5 days
+  - Basic Help: 2-3 days
+  - Critical UX: 2-3 days
+  - Testing: 2-3 days
+- **Phase 3 (Nice-to-Have):** Post-launch or as time permits
+- **Phase 4 (Future):** Post-launch
 
-## Success Criteria
+**Target Launch:** 1-2 weeks from now
 
-✅ **Portfolio Ready:**
-- Clean, well-documented code
-- Comprehensive test coverage
-- Professional README
-- Demonstrates best practices
+## Success Criteria (MVP for Launch)
 
-✅ **App Store Ready:**
-- Passes all review guidelines
-- Professional assets complete
-- Legal requirements met
-- Beta tested and polished
+✅ **Minimum App Store Requirements:**
+- ✅ Clean, stable codebase (Phase 1 complete)
+- ✅ Comprehensive test coverage (Phase 1 complete)
+- [ ] Privacy policy created and linked
+- [ ] Professional app icon and screenshots
+- [ ] Compelling app description
+- [ ] Passes App Store review guidelines
+- [ ] Basic onboarding/help
+- [ ] Confirmation dialogs for destructive actions
+- [ ] Tested on multiple devices and iOS versions
+- [ ] No crashes or major bugs
 
-✅ **User Ready:**
-- Intuitive onboarding
-- Accessible to all users
-- Stable and performant
-- Delightful user experience
+**Everything else can be improved post-launch!**

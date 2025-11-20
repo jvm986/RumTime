@@ -15,6 +15,10 @@ struct GamesView: View {
     @State private var isPresentingNewGameView = false
     @State private var newGameData = Game.Data()
     @State private var newPlayerName = ""
+    @State private var gameToDelete: Game?
+    @State private var showingDeleteConfirmation = false
+    @State private var showingHelpView = false
+    @State private var showingPrivacyPolicy = false
 
     func duplicateGame(_ game: Game) {
         var gameData = game.data
@@ -42,13 +46,14 @@ struct GamesView: View {
                 EmptyStateView()
             } else {
                 List {
-                    ForEach(games) { game in
-                        ZStack {
-                            NavigationLink(destination: DetailView(game: game)) {
-                                EmptyView()
-                            }
-                            .opacity(0)
-
+                    ForEach(games.filter { game in
+                        // Hide the game that's pending deletion
+                        if let gameToDelete = gameToDelete {
+                            return game.id != gameToDelete.id
+                        }
+                        return true
+                    }) { game in
+                        NavigationLink(value: game.id) {
                             GameCardView(game: game)
                         }
                         .listRowBackground(Color.clear)
@@ -63,21 +68,63 @@ struct GamesView: View {
                         }
                     }
                     .onDelete { indices in
-                        for index in indices {
-                            modelContext.delete(games[index])
+                        if let index = indices.first {
+                            gameToDelete = games[index]
+                            showingDeleteConfirmation = true
                         }
                     }
                 }
             }
         }
         .navigationTitle("Games")
-        .toolbar {
-            Button(action: {
-                isPresentingNewGameView = true
-            }) {
-                Image(systemName: "plus")
+        .navigationDestination(for: UUID.self) { gameID in
+            if let game = games.first(where: { $0.id == gameID }) {
+                DetailView(game: game)
             }
-            .accessibilityLabel("New Game")
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Menu {
+                    Button {
+                        showingHelpView = true
+                    } label: {
+                        Label("Help", systemImage: "questionmark.circle")
+                    }
+
+                    Button {
+                        showingPrivacyPolicy = true
+                    } label: {
+                        Label("Privacy Policy", systemImage: "hand.raised")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .accessibilityLabel("More options")
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    isPresentingNewGameView = true
+                }) {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("New Game")
+            }
+        }
+        .alert("Delete Game?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let game = gameToDelete {
+                    modelContext.delete(game)
+                    gameToDelete = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                gameToDelete = nil
+            }
+        } message: {
+            if let game = gameToDelete {
+                Text("Are you sure you want to delete \"\(game.name)\"? This action cannot be undone.")
+            }
         }
         .sheet(isPresented: $isPresentingNewGameView) {
             NavigationView {
@@ -109,6 +156,12 @@ struct GamesView: View {
                         }
                     }
             }
+        }
+        .sheet(isPresented: $showingHelpView) {
+            HelpView()
+        }
+        .sheet(isPresented: $showingPrivacyPolicy) {
+            PrivacyPolicyView()
         }
     }
 }

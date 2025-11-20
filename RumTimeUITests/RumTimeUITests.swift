@@ -26,6 +26,12 @@ final class RumTimeUITests: XCTestCase {
 
     @MainActor
     func testCompleteGameFlow() throws {
+        // Dismiss welcome screen if it appears (first launch)
+        let getStartedButton = app.buttons["Get Started"]
+        if getStartedButton.waitForExistence(timeout: 3) {
+            getStartedButton.tap()
+        }
+
         // Clean up any existing "Flow Test Game" from previous failed runs
         let existingGame = app.staticTexts["Flow Test Game"]
         if existingGame.waitForExistence(timeout: 2) {
@@ -33,6 +39,11 @@ final class RumTimeUITests: XCTestCase {
             let deleteButton = app.buttons["Delete"]
             if deleteButton.waitForExistence(timeout: 1) {
                 deleteButton.tap()
+                // Handle the new confirmation dialog
+                let confirmDeleteButton = app.buttons["Delete"]
+                if confirmDeleteButton.waitForExistence(timeout: 1) {
+                    confirmDeleteButton.tap()
+                }
             }
         }
 
@@ -147,6 +158,11 @@ final class RumTimeUITests: XCTestCase {
         let deleteButton = app.buttons["Delete"]
         XCTAssertTrue(deleteButton.waitForExistence(timeout: 2), "Delete button should appear")
         deleteButton.tap()
+
+        // Confirm deletion in the alert dialog
+        let confirmDeleteButton = app.buttons["Delete"]
+        XCTAssertTrue(confirmDeleteButton.waitForExistence(timeout: 2), "Confirm delete button should appear")
+        confirmDeleteButton.tap()
 
         // Verify game is deleted
         XCTAssertFalse(app.staticTexts["Flow Test Game"].exists, "Game should be deleted")

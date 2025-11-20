@@ -12,7 +12,10 @@ import SwiftData
 struct RumTimeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Game.self,
+            Player.self,
+            Round.self,
+            Score.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +28,9 @@ struct RumTimeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                GamesView()
+            }
         }
         .modelContainer(sharedModelContainer)
     }

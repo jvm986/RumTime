@@ -27,8 +27,20 @@ final class Round {
     }
 
     /// Returns the winning score entry for this round.
+    /// Returns the first score if no winner is explicitly marked.
+    /// Returns a placeholder score if the round has no scores (data integrity issue).
     var winner: Score {
-        scores.first(where: { $0.isWinner }) ?? scores[0]
+        if let winningScore = scores.first(where: { $0.isWinner }) {
+            return winningScore
+        }
+
+        // Fallback to first score if available
+        if let firstScore = scores.first {
+            return firstScore
+        }
+
+        // Final fallback for data integrity issues - should not happen in normal use
+        return Score(playerID: UUID(), playerName: "Unknown", playerTheme: .ash, score: 0, isWinner: true)
     }
 
     /// Data transfer object for round creation/editing.
@@ -50,7 +62,17 @@ final class Round {
         }
 
         var winner: ScoreData {
-            scores.first(where: { $0.isWinner }) ?? scores[0]
+            if let winningScore = scores.first(where: { $0.isWinner }) {
+                return winningScore
+            }
+
+            // Fallback to first score if available
+            if let firstScore = scores.first {
+                return firstScore
+            }
+
+            // Final fallback - should not happen in normal use
+            return ScoreData(player: Player(id: UUID(), name: "Unknown", theme: .ash), score: 0, isWinner: true)
         }
 
         /// Temporary data structure for scores before persistence

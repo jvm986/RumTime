@@ -5,8 +5,8 @@
 //  Created by James Maguire on 14/10/2022.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct DetailView: View {
     let game: Game
@@ -18,10 +18,12 @@ struct DetailView: View {
     @State private var isPresentingScoreView = false
     @State private var editPlayerName = ""
     @State var roundTimer = RoundTimer()
+    @State private var roundToDelete: IndexSet?
+    @State private var showingDeleteRoundConfirmation = false
 
     private var canSaveGame: Bool {
-        let hasEnoughPlayers = gameData.players.count >= 2 ||
-                               (gameData.players.count == 1 && !editPlayerName.isEmpty)
+        let hasEnoughPlayers =
+            gameData.players.count >= 2 || (gameData.players.count == 1 && !editPlayerName.isEmpty)
         return hasEnoughPlayers && !gameData.name.isEmpty && gameData.startingTime > 0
     }
 
@@ -42,63 +44,70 @@ struct DetailView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-            Section(header: Text("Players")) {
-                ForEach(game.sortedPlayers) { player in
-                    HStack {
-                        Label(player.name, systemImage: player.isPaused ? "person.slash" : "person")
-                        Spacer()
-                        if player.isPaused {
-                            Text("Sitting Out")
-                                .font(.caption)
-                                .italic()
-                        } else {
-                            Text("\(player.totalScore()) points")
+                Section(header: Text("Players")) {
+                    ForEach(game.sortedPlayers) { player in
+                        HStack {
+                            Label(
+                                player.name,
+                                systemImage: player.isPaused ? "person.slash" : "person")
+                            Spacer()
+                            if player.isPaused {
+                                Text("Sitting Out")
+                                    .font(.caption)
+                                    .italic()
+                            } else {
+                                Text("\(player.totalScore()) points")
+                            }
                         }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(player.theme.mainColor)
-                    .foregroundColor(player.theme.accentColor)
-                    .cornerRadius(10)
-                    .opacity(player.isPaused ? 0.6 : 1.0)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if !roundTimer.isActive {
-                            game.togglePausedPlayer(id: player.id)
-                            roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(player.theme.mainColor)
+                        .foregroundColor(player.theme.accentColor)
+                        .cornerRadius(10)
+                        .opacity(player.isPaused ? 0.6 : 1.0)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if !roundTimer.isActive {
+                                game.togglePausedPlayer(id: player.id)
+                                roundTimer.reset(
+                                    startingTime: game.startingTime, turnBonus: game.turnBonus,
+                                    players: game.unpausedPlayers, starter: game.unpausedStarter)
+                            }
                         }
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel(player.isPaused ? "\(player.name), sitting out, \(player.totalScore()) points. Tap to rejoin game" : "\(player.name), \(player.totalScore()) points. Tap to sit out")
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                }
-            }
-            Section(header: Text("Rounds")) {
-                if game.rounds.isEmpty {
-                    Label("No rounds yet", systemImage: "calendar.badge.exclamationmark")
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(
+                            player.isPaused
+                                ? "\(player.name), sitting out, \(player.totalScore()) points. Tap to rejoin game"
+                                : "\(player.name), \(player.totalScore()) points. Tap to sit out"
+                        )
                         .listRowBackground(Color.clear)
-                }
-                ForEach(game.rounds) { round in
-                    HStack {
-                        Image(systemName: "calendar")
-                        Text(round.date.formatted())
-                        Spacer()
-                        Label(round.winner.playerName, systemImage: "trophy.fill")
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(UIColor.secondarySystemGroupedBackground))
-                    .cornerRadius(10)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                }
-                .onDelete { indices in
-                    for index in indices {
-                        modelContext.delete(game.rounds[index])
+                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     }
                 }
-            }
+                Section(header: Text("Rounds")) {
+                    if game.rounds.isEmpty {
+                        Label("No rounds yet", systemImage: "calendar.badge.exclamationmark")
+                            .listRowBackground(Color.clear)
+                    }
+                    ForEach(game.rounds) { round in
+                        HStack {
+                            Image(systemName: "calendar")
+                            Text(round.date.formatted())
+                            Spacer()
+                            Label(round.winner.playerName, systemImage: "trophy.fill")
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(UIColor.secondarySystemGroupedBackground))
+                        .cornerRadius(10)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    }
+                    .onDelete { indices in
+                        roundToDelete = indices
+                        showingDeleteRoundConfirmation = true
+                    }
+                }
             }
             .navigationTitle(game.name)
             .toolbar {
@@ -118,20 +127,21 @@ struct DetailView: View {
                             .font(.title2)
                         Text("Resume Round")
                             .fontWeight(.semibold)
-                        Text("(\(roundTimer.activePlayer))")
-                            .fontWeight(.regular)
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(roundTimer.activeTheme.accentColor)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.accentColor)
+                    .background(roundTimer.activeTheme.mainColor)
                     .cornerRadius(15)
                     .shadow(radius: 4)
                 }
                 .padding()
-            } else {
+            } else if !game.unpausedPlayers.isEmpty && game.unpausedStarter < game.unpausedPlayers.count {
+                let startingPlayer = game.unpausedPlayers[game.unpausedStarter]
                 Button {
-                    roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
+                    roundTimer.reset(
+                        startingTime: game.startingTime, turnBonus: game.turnBonus,
+                        players: game.unpausedPlayers, starter: game.unpausedStarter)
                     roundTimer.startRound()
                 } label: {
                     HStack {
@@ -139,13 +149,11 @@ struct DetailView: View {
                             .font(.title2)
                         Text("Start Round")
                             .fontWeight(.semibold)
-                        Text("(\(game.unpausedPlayers[game.unpausedStarter].name) starts)")
-                            .fontWeight(.regular)
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(startingPlayer.theme.accentColor)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.accentColor)
+                    .background(startingPlayer.theme.mainColor)
                     .cornerRadius(15)
                     .shadow(radius: 4)
                 }
@@ -154,30 +162,33 @@ struct DetailView: View {
         }
         .sheet(isPresented: $isPresentingEditView) {
             NavigationView {
-                DetailEditView(data: $gameData, roundTimer: roundTimer, newPlayerName: $editPlayerName)
-                    .navigationTitle(game.name)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                isPresentingEditView = false
-                                editPlayerName = ""
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") {
-                                // Add the unsaved player if there's one in the text field
-                                if !editPlayerName.isEmpty {
-                                    let playerData = Game.Data.PlayerData(name: editPlayerName, theme: gameData.randomTheme)
-                                    gameData.players.append(playerData)
-                                }
-
-                                isPresentingEditView = false
-                                game.update(from: gameData)
-                                editPlayerName = ""
-                            }
-                            .disabled(!canSaveGame)
+                DetailEditView(
+                    data: $gameData, roundTimer: roundTimer, newPlayerName: $editPlayerName
+                )
+                .navigationTitle(game.name)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            isPresentingEditView = false
+                            editPlayerName = ""
                         }
                     }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            // Add the unsaved player if there's one in the text field
+                            if !editPlayerName.isEmpty {
+                                let playerData = Game.Data.PlayerData(
+                                    name: editPlayerName, theme: gameData.randomTheme)
+                                gameData.players.append(playerData)
+                            }
+
+                            isPresentingEditView = false
+                            game.update(from: gameData)
+                            editPlayerName = ""
+                        }
+                        .disabled(!canSaveGame)
+                    }
+                }
             }
         }
         .sheet(isPresented: $roundTimer.isPaused.not) {
@@ -209,13 +220,16 @@ struct DetailView: View {
                 ScoreView(round: $roundData)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
+                            Button("Resume") {
                                 isPresentingScoreView = false
+                                roundTimer.unpauseGame()
                             }
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Record") {
-                                roundTimer.reset(startingTime: game.startingTime, turnBonus: game.turnBonus, players: game.unpausedPlayers, starter: game.unpausedStarter)
+                                roundTimer.reset(
+                                    startingTime: game.startingTime, turnBonus: game.turnBonus,
+                                    players: game.unpausedPlayers, starter: game.unpausedStarter)
                                 game.addRound(from: roundData)
                                 isPresentingScoreView = false
                             }
@@ -228,12 +242,28 @@ struct DetailView: View {
                 roundTimer.pauseRound()
             }
         }
+        .alert("Delete Round?", isPresented: $showingDeleteRoundConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let indices = roundToDelete {
+                    for index in indices {
+                        modelContext.delete(game.rounds[index])
+                    }
+                    roundToDelete = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                roundToDelete = nil
+            }
+        } message: {
+            Text("Are you sure you want to delete this round? This action cannot be undone.")
+        }
     }
 }
 
 #Preview {
     do {
-        let container = try ModelContainer(for: Game.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(
+            for: Game.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         let game = Game.sampleData[1]
         container.mainContext.insert(game)
 

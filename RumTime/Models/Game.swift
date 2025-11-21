@@ -164,7 +164,7 @@ final class Game {
         var startingTime: Double = 60
         var turnBonus: Double = 3
         var players: [PlayerData] = []
-        var theme: Theme = .saffron
+        var theme: Theme = Theme.allCases.randomElement() ?? .saffron
         var starter = 0
 
         var randomTheme: Theme {

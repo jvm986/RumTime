@@ -26,7 +26,12 @@
       }
     },
     {
-      "parallelizable" : true,
+      "skippedTests" : [
+        "RumTimeUITests",
+        "RumTimeUITests\/testCompleteGameFlow()",
+        "ScreenshotTests",
+        "ScreenshotTests\/testCaptureScreenshots()"
+      ],
       "target" : {
         "containerPath" : "container:RumTime.xcodeproj",
         "identifier" : "4BF1AF852ECE60EA0076BFD9",

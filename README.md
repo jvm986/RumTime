@@ -24,10 +24,6 @@ xcodebuild test -project RumTime.xcodeproj -scheme RumTime -only-testing:RumTime
 xcodebuild test -project RumTime.xcodeproj -scheme RumTime -only-testing:RumTimeUITests -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.1'
 ```
 
-## Development
-
-See [ROADMAP.md](ROADMAP.md)
-
 ## Requirements
 
 - Xcode 16.0+
@@ -43,7 +39,3 @@ The app uses SwiftData for persistence with the following model structure:
 - **Round**: Completed round with date and scores
 - **Score**: Individual player score within a round
 - **RoundTimer**: Observable class managing active timer state (not persisted)
-
-## Author
-
-James Maguire

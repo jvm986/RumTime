@@ -9,32 +9,33 @@ import SwiftUI
 
 struct ScoreView: View {
     @Binding var round: Round.Data
+    var onDelete: (() -> Void)?
+    var onResume: (() -> Void)?
+    var onRecord: (() -> Void)?
+
+    private var winnerID: Binding<UUID> {
+        Binding(
+            get: {
+                round.scores.first(where: { $0.isWinner })?.playerID ?? UUID()
+            },
+            set: { newID in
+                round.setWinner(id: newID)
+            }
+        )
+    }
 
     var body: some View {
-        Form {
+        NavigationStack {
+            Form {
             Section(header: Text("Winner")) {
-                ForEach($round.scores) { $score in
-                    Button(action: {
-                        round.setWinner(id: score.playerID)
-                    }) {
-                        HStack {
-                            Image(systemName: score.isWinner ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(score.isWinner ? .green : .gray)
-                                .imageScale(.large)
-                            Text(score.playerName)
-                                .foregroundColor(.primary)
-                            Spacer()
-                            if score.isWinner {
-                                Image(systemName: "trophy.fill")
-                                    .foregroundColor(.yellow)
-                            }
-                        }
-                        .contentShape(Rectangle())
+                Picker("Select Winner", selection: winnerID) {
+                    ForEach(round.scores) { score in
+                        Text(score.playerName)
+                            .tag(score.playerID)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(score.isWinner ? "\(score.playerName), winner" : "Select \(score.playerName) as winner")
-                    .accessibilityAddTraits(score.isWinner ? [.isButton, .isSelected] : .isButton)
                 }
+                .pickerStyle(.menu)
+                .accessibilityLabel("Winner picker")
             }
 
             Section(header: Text("Scores")) {
@@ -44,7 +45,7 @@ struct ScoreView: View {
                             Text(score.playerName)
                             Spacer()
                             Picker("", selection: $score.score) {
-                                ForEach(1 ..< 200, id: \.self) {
+                                ForEach(0 ..< 200, id: \.self) {
                                     Text("\($0) points")
                                 }
                             }
@@ -54,9 +55,41 @@ struct ScoreView: View {
                     }
                 }
             }
+
+                if let onDelete = onDelete {
+                    Section {
+                        Button(role: .destructive) {
+                            onDelete()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Label("Delete Round", systemImage: "trash")
+                                    .foregroundColor(.red)
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Record Scores")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    if let onResume = onResume {
+                        Button("Resume") {
+                            onResume()
+                        }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    if let onRecord = onRecord {
+                        Button("Record") {
+                            onRecord()
+                        }
+                    }
+                }
+            }
         }
-        .navigationTitle("Record Scores")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

@@ -10,7 +10,7 @@ import SwiftData
 
 /// Represents a game session with multiple players and round history.
 ///
-/// A Game tracks all the configuration and state for a Rummy/Rummikub session,
+/// A Game tracks all the configuration and state for a Rummy session,
 /// including player roster, timing settings, and complete round history.
 /// Games are persisted using SwiftData and can be resumed across app launches.
 @Model
@@ -20,15 +20,11 @@ final class Game {
     var startingTime: Int
     var turnBonus: Int
     var starter: Int
-    var themeRawValue: String
+    var winnerGetsSumOfLosersScores: Bool
+    var theme: Theme
 
     @Relationship(deleteRule: .cascade) var players: [Player]
     @Relationship(deleteRule: .cascade) var rounds: [Round]
-
-    var theme: Theme {
-        get { Theme(rawValue: themeRawValue) ?? .chive }
-        set { themeRawValue = newValue.rawValue }
-    }
 
     init(
         id: UUID = UUID(),
@@ -38,7 +34,8 @@ final class Game {
         players: [Player] = [],
         starter: Int = 0,
         rounds: [Round] = [],
-        theme: Theme = .chive
+        winnerGetsSumOfLosersScores: Bool = true,
+        theme: Theme = .saffron
     ) {
         self.id = id
         self.name = name
@@ -47,7 +44,8 @@ final class Game {
         self.players = players
         self.starter = starter
         self.rounds = rounds
-        self.themeRawValue = theme.rawValue
+        self.winnerGetsSumOfLosersScores = winnerGetsSumOfLosersScores
+        self.theme = theme
     }
 
     var startingTimeString: String {
@@ -78,21 +76,25 @@ final class Game {
         players.filter { !$0.isPaused }
     }
 
-    /// Records a completed round and updates game state.
+    /// Calculates properly scored Score objects from Round.Data.
     ///
     /// This method:
     /// 1. Inverts loser scores (positive input becomes negative)
-    /// 2. Awards winner the sum of all loser scores
-    /// 3. Inserts round at the beginning of history (newest first)
-    /// 4. Advances starter to the next unpaused player
+    /// 2. Awards winner based on scoring mode:
+    ///    - If winnerGetsSumOfLosersScores is true: winner gets sum of all loser scores
+    ///    - If false: winner gets 0
     ///
     /// - Parameter roundData: Round data containing scores and winner information
-    func addRound(from roundData: Round.Data) {
+    /// - Returns: Array of Score objects with proper scoring applied
+    func calculateScores(from roundData: Round.Data) -> [Score] {
         var total = 0
         var newScores: [Score] = []
 
         for scoreData in roundData.scores {
-            total += scoreData.score
+            // Only add loser scores to total (winner gets sum of losers)
+            if !scoreData.isWinner {
+                total += scoreData.score
+            }
             newScores.append(
                 Score(
                     playerID: scoreData.playerID,
@@ -104,12 +106,35 @@ final class Game {
             )
         }
 
-        for idx in newScores.indices {
-            if newScores[idx].isWinner {
-                newScores[idx].score = total
+        if winnerGetsSumOfLosersScores {
+            for idx in newScores.indices {
+                if newScores[idx].isWinner {
+                    newScores[idx].score = total
+                }
+            }
+        } else {
+            // In standard scoring mode, winner's score is just their own score (negated above)
+            // but we want winner to have 0 points, so we set it explicitly
+            for idx in newScores.indices {
+                if newScores[idx].isWinner {
+                    newScores[idx].score = 0
+                }
             }
         }
 
+        return newScores
+    }
+
+    /// Records a completed round and updates game state.
+    ///
+    /// This method:
+    /// 1. Calculates scores using calculateScores()
+    /// 2. Inserts round at the beginning of history (newest first)
+    /// 3. Advances starter to the next unpaused player
+    ///
+    /// - Parameter roundData: Round data containing scores and winner information
+    func addRound(from roundData: Round.Data) {
+        let newScores = calculateScores(from: roundData)
         let round = Round(date: roundData.date, scores: newScores)
         rounds.insert(round, at: 0)
         starter = nextUnpausedPlayer(current: starter)
@@ -164,11 +189,15 @@ final class Game {
         var startingTime: Double = 60
         var turnBonus: Double = 3
         var players: [PlayerData] = []
-        var theme: Theme = Theme.allCases.randomElement() ?? .saffron
         var starter = 0
+        var winnerGetsSumOfLosersScores: Bool = true
+        var theme: Theme = Theme.allCases.randomElement() ?? .saffron
 
         var randomTheme: Theme {
             var cases = Theme.allCases
+            // Remove theme assigned to the game
+            cases.removeAll { $0 == theme }
+            // Remove themes assigned to players
             for p in players {
                 cases.removeAll { $0 == p.theme }
             }
@@ -196,8 +225,9 @@ final class Game {
             startingTime: Double(startingTime),
             turnBonus: Double(turnBonus),
             players: players.map { Data.PlayerData(id: $0.id, name: $0.name, theme: $0.theme, isPaused: $0.isPaused) },
-            theme: theme,
-            starter: starter
+            starter: starter,
+            winnerGetsSumOfLosersScores: winnerGetsSumOfLosersScores,
+            theme: theme
         )
     }
 
@@ -206,6 +236,7 @@ final class Game {
         name = data.name
         startingTime = Int(data.startingTime)
         turnBonus = Int(data.turnBonus)
+        winnerGetsSumOfLosersScores = data.winnerGetsSumOfLosersScores
         theme = data.theme
 
         // Update existing players or create new ones
@@ -233,6 +264,7 @@ final class Game {
             turnBonus: Int(data.turnBonus),
             players: data.players.map { $0.toPlayer() },
             starter: data.starter,
+            winnerGetsSumOfLosersScores: data.winnerGetsSumOfLosersScores,
             theme: data.theme
         )
     }
@@ -274,7 +306,7 @@ extension Game {
                     Score(playerID: UUID(), playerName: "Luke", playerTheme: .saffron, score: 10, isWinner: true)
                 ])
             ],
-            theme: .coralpink
+            theme: .saffron
         ),
         Game(
             name: "Short",
@@ -291,7 +323,7 @@ extension Game {
                     Score(playerID: UUID(), playerName: "Luke", playerTheme: .saffron, score: 10, isWinner: true)
                 ])
             ],
-            theme: .ash
+            theme: .navyblazer
         )
     ]
 }

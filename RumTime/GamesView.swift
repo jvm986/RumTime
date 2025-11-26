@@ -14,31 +14,6 @@ struct GamesView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isPresentingNewGameView = false
     @State private var newGameData = Game.Data()
-    @State private var newPlayerName = ""
-    @State private var gameToDelete: Game?
-    @State private var showingDeleteConfirmation = false
-    @State private var showingHelpView = false
-    @State private var showingPrivacyPolicy = false
-
-    func duplicateGame(_ game: Game) {
-        var gameData = game.data
-
-        // Assign a new random theme to the game (avoiding the original game's theme)
-        let availableThemes = Theme.allCases.filter { $0 != game.theme }
-        if let newTheme = availableThemes.randomElement() {
-            gameData.theme = newTheme
-        }
-
-        let duplicatedGame = Game(data: gameData)
-        duplicatedGame.name = "\(game.name) (Copy)"
-        modelContext.insert(duplicatedGame)
-    }
-
-    private var canCreateGame: Bool {
-        let hasEnoughPlayers = newGameData.players.count >= 2 ||
-                               (newGameData.players.count == 1 && !newPlayerName.isEmpty)
-        return hasEnoughPlayers && !newGameData.name.isEmpty && newGameData.startingTime > 0
-    }
 
     var body: some View {
         Group {
@@ -46,64 +21,53 @@ struct GamesView: View {
                 EmptyStateView()
             } else {
                 List {
-                    ForEach(games.filter { game in
-                        // Hide the game that's pending deletion
-                        if let gameToDelete = gameToDelete {
-                            return game.id != gameToDelete.id
-                        }
-                        return true
-                    }) { game in
+                    ForEach(games) { game in
                         NavigationLink(value: game.id) {
-                            GameCardView(game: game)
-                        }
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                duplicateGame(game)
-                            } label: {
-                                Label("Duplicate", systemImage: "doc.on.doc")
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(game.name)
+                                    .font(.headline)
+                                    .foregroundColor(game.theme.accentColor)
+                                    .accessibilityAddTraits(.isHeader)
+
+                                HStack(spacing: 12) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "person.3")
+                                        Text("\(game.players.count)")
+                                    }
+                                    .accessibilityLabel("\(game.players.count) players")
+
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock")
+                                        Text("\(game.startingTimeString)")
+                                    }
+                                    .accessibilityLabel("\(game.startingTime) starting time")
+                                }
+                                .font(.caption)
+                                .foregroundColor(game.theme.accentColor)
                             }
-                            .tint(.blue)
+                            .padding(.vertical, 5)
                         }
-                    }
-                    .onDelete { indices in
-                        if let index = indices.first {
-                            gameToDelete = games[index]
-                            showingDeleteConfirmation = true
-                        }
+                        .listRowBackground(game.theme.mainColor)
                     }
                 }
             }
         }
         .navigationTitle("Games")
+        .navigationSubtitle(games.isEmpty ? "" : "Tap the + button to create a new game")
         .navigationDestination(for: UUID.self) { gameID in
             if let game = games.first(where: { $0.id == gameID }) {
                 DetailView(game: game)
             }
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Menu {
-                    Button {
-                        showingHelpView = true
-                    } label: {
-                        Label("Help", systemImage: "questionmark.circle")
-                    }
-
-                    Button {
-                        showingPrivacyPolicy = true
-                    } label: {
-                        Label("Privacy Policy", systemImage: "hand.raised")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-                .accessibilityLabel("More options")
-            }
-
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    // Set a random theme that's not already used by existing games
+                    var availableThemes = Theme.allCases
+                    for game in games {
+                        availableThemes.removeAll { $0 == game.theme }
+                    }
+                    newGameData.theme = availableThemes.randomElement() ?? Theme.allCases.randomElement() ?? .saffron
                     isPresentingNewGameView = true
                 }) {
                     Image(systemName: "plus")
@@ -111,57 +75,19 @@ struct GamesView: View {
                 .accessibilityLabel("New Game")
             }
         }
-        .alert("Delete Game?", isPresented: $showingDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
-                if let game = gameToDelete {
-                    modelContext.delete(game)
-                    gameToDelete = nil
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                gameToDelete = nil
-            }
-        } message: {
-            if let game = gameToDelete {
-                Text("Are you sure you want to delete \"\(game.name)\"? This action cannot be undone.")
-            }
-        }
         .sheet(isPresented: $isPresentingNewGameView) {
             NavigationView {
-                DetailEditView(data: $newGameData, roundTimer: RoundTimer(), newPlayerName: $newPlayerName)
-                    .navigationTitle("New Game")
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Dismiss") {
-                                isPresentingNewGameView = false
-                                newGameData = Game.Data()
-                                newPlayerName = ""
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Create Game") {
-                                // Add the unsaved player if there's one in the text field
-                                if !newPlayerName.isEmpty {
-                                    let playerData = Game.Data.PlayerData(name: newPlayerName, theme: newGameData.randomTheme)
-                                    newGameData.players.append(playerData)
-                                }
-
-                                let newGame = Game(data: newGameData)
-                                modelContext.insert(newGame)
-                                isPresentingNewGameView = false
-                                newGameData = Game.Data()
-                                newPlayerName = ""
-                            }
-                            .disabled(!canCreateGame)
-                        }
+                DetailView(
+                    game: Game(data: newGameData),
+                    isNewGame: true,
+                    onSave: {
+                        newGameData = Game.Data()
                     }
+                )
             }
-        }
-        .sheet(isPresented: $showingHelpView) {
-            HelpView()
-        }
-        .sheet(isPresented: $showingPrivacyPolicy) {
-            PrivacyPolicyView()
+            .onDisappear {
+                newGameData = Game.Data()
+            }
         }
     }
 }

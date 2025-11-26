@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "6C523D2C-73CE-4A3C-B021-3C226798A2CB",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:RumTime.xcodeproj",
+        "identifier" : "4BF1AF852ECE60EA0076BFD9",
+        "name" : "RumTimeUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

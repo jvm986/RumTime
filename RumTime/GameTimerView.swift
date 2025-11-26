@@ -13,21 +13,31 @@ struct GameTimerView: View {
     let timeRemaining: Double
     let currentPlayer: String
     let theme: Theme
-    
+
     var body: some View {
-        Circle()
-            .strokeBorder(lineWidth: 24)
-            .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
-            .overlay {
+        GeometryReader { geometry in
+            let size = min(geometry.size.width, geometry.size.height)
+            let strokeWidth = size * 0.05  // 5% of size
+            let arcWidth = size * 0.025    // 2.5% of size
+
+            ZStack {
+                Circle()
+                    .strokeBorder(lineWidth: strokeWidth)
+                    .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
+
                 TimeView(totalSeconds: timeRemaining)
                     .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
-                    .frame(maxWidth: 200)
-            }
-            .overlay {
-                PlayerArc(startingTime: startingTime, timeRemaining: timeRemaining)
+                    .padding(size * 0.15)
+
+                Circle()
+                    .trim(from: 0, to: CGFloat(timeRemaining / Double(startingTime)))
                     .rotation(Angle(degrees: -90))
-                    .stroke(timeRemaining > 15 ? theme.mainColor: .red, lineWidth: 12)
+                    .stroke(timeRemaining > 15 ? theme.mainColor: .red, style: StrokeStyle(lineWidth: arcWidth, lineCap: .round))
+                    .padding(strokeWidth / 2)
             }
+            .frame(width: size, height: size)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 }
 

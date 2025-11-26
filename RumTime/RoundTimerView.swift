@@ -11,6 +11,8 @@ import SwiftData
 struct RoundTimerView: View {
     let game: Game
     @Bindable var roundTimer: RoundTimer
+    var onPause: (() -> Void)?
+    var onEnd: (() -> Void)?
 
     private func timeRemainingDescription(_ seconds: Double) -> String {
         let mins = Int(seconds) / 60
@@ -23,42 +25,64 @@ struct RoundTimerView: View {
     }
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(roundTimer.secondsRemainingForTurn > 10 ? roundTimer.activeTheme.mainColor: .red)
-            VStack {
-                GameTimerView(
-                    turn: roundTimer.turn,
-                    startingTime: roundTimer.startingTime,
-                    timeRemaining: roundTimer.secondsRemainingForTurn,
-                    currentPlayer: roundTimer.activePlayer,
-                    theme: roundTimer.activeTheme
-                )
-                .padding(.horizontal)
-                GameFooterView(
-                    turn: roundTimer.turn,
-                    nextPlayer: roundTimer.nextPlayer,
-                    theme: roundTimer.activeTheme,
-                    timeRemaining: roundTimer.secondsRemainingForTurn
-                )
+        NavigationStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(roundTimer.secondsRemainingForTurn > 10 ? roundTimer.activeTheme.mainColor: .red)
+                VStack {
+                    Spacer()
+
+                    GameTimerView(
+                        turn: roundTimer.turn,
+                        startingTime: roundTimer.startingTime,
+                        timeRemaining: roundTimer.secondsRemainingForTurn,
+                        currentPlayer: roundTimer.activePlayer,
+                        theme: roundTimer.activeTheme
+                    )
+                    .aspectRatio(1, contentMode: .fit)
+                    .padding(.horizontal, 40)
+
+                    Spacer()
+
+                    GameFooterView(
+                        turn: roundTimer.turn,
+                        nextPlayer: roundTimer.nextPlayer,
+                        theme: roundTimer.activeTheme,
+                        timeRemaining: roundTimer.secondsRemainingForTurn
+                    )
+                }
             }
-            .padding(.top)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(roundTimer.activePlayer)'s turn")
-        .accessibilityValue(timeRemainingDescription(roundTimer.secondsRemainingForTurn))
-        .accessibilityHint("Double tap to end turn and move to next player")
-        .accessibilityAddTraits(.isButton)
-        .onTapGesture {
-            roundTimer.endTurn()
-        }
-        .alert("\(roundTimer.activePlayer)'s time is up!", isPresented: $roundTimer.isShowingAlert) {
-            Button("OK", role: .cancel) {
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(roundTimer.activePlayer)'s turn")
+            .accessibilityValue(timeRemainingDescription(roundTimer.secondsRemainingForTurn))
+            .accessibilityHint("Tap to end turn and move to next player")
+            .accessibilityAddTraits(.isButton)
+            .onTapGesture {
                 roundTimer.endTurn()
             }
+            .alert("\(roundTimer.activePlayer)'s time is up!", isPresented: $roundTimer.isShowingAlert) {
+                Button("OK", role: .cancel) {
+                    roundTimer.endTurn()
+                }
+            }
+            .padding()
+            .interactiveDismissDisabled()
+            .navigationTitle(roundTimer.activePlayer)
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Pause Round") {
+                        onPause?()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("End Round") {
+                        onEnd?()
+                    }
+                    .accessibilityIdentifier("End Round")
+                }
+            }
         }
-        .padding()
-        .interactiveDismissDisabled()
     }
 }
 

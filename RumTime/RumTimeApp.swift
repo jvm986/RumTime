@@ -30,18 +30,22 @@ struct RumTimeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                GamesView()
-            }
-            .sheet(isPresented: Binding(
-                get: { !hasSeenWelcome },
-                set: { if !$0 { hasSeenWelcome = true } }
-            )) {
-                WelcomeView(isPresented: Binding(
+            MainTabView()
+                .sheet(isPresented: Binding(
                     get: { !hasSeenWelcome },
                     set: { if !$0 { hasSeenWelcome = true } }
-                ))
-            }
+                )) {
+                    NavigationStack {
+                        HelpView()
+                            .toolbar {
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Get Started") {
+                                        hasSeenWelcome = true
+                                    }
+                                }
+                            }
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }

@@ -8,20 +8,30 @@
 import SwiftUI
 
 struct HelpView: View {
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
-        NavigationView {
-            List {
-                Section(header: Text("About RumTime")) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("RumTime helps you manage timed Rummy games with ease. Track players, manage rounds, and keep score all in one place.")
-                            .font(.body)
-                    }
-                    .padding(.vertical, 8)
-                }
+        ScrollView {
+            VStack(spacing: 30) {
+                // App Icon
+                Image("LaunchLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
 
-                Section(header: Text("How to Use")) {
+                // Title
+                Text("Rum Time")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+
+                // Description
+                Text("A chess-style timer for Rummy. Players start with a time bank and receive incremental time each turn, allowing them to save time for complex moves rather than being locked to fixed turn durations.")
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+
+                // Features
+                VStack(alignment: .leading, spacing: 20) {
                     HelpItem(
                         icon: "plus.circle.fill",
                         title: "Create a Game",
@@ -52,63 +62,30 @@ struct HelpView: View {
                         description: "When the round ends, select the winner and enter scores. The round will be saved to your game history."
                     )
                 }
+                .padding(.horizontal)
 
-                Section(header: Text("Basic Rummy Rules")) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("**Objective**")
-                            .font(.headline)
-                        Text("Be the first to arrange all your cards into valid sets and runs.")
-                            .font(.body)
-
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Text("**Sets**")
-                            .font(.headline)
-                        Text("3 or 4 cards of the same rank (e.g., 7♠ 7♥ 7♦)")
-                            .font(.body)
-
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Text("**Runs**")
-                            .font(.headline)
-                        Text("3+ cards of the same suit in sequence (e.g., 4♠ 5♠ 6♠)")
-                            .font(.body)
-
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Text("**Winning**")
-                            .font(.headline)
-                        Text("Arrange all cards into valid sets/runs and discard your final card to win the round.")
-                            .font(.body)
+                // Support Link
+                Link(destination: URL(string: "https://github.com/jvm986/RumTime")!) {
+                    HStack {
+                        Image(systemName: "questionmark.circle")
+                        Text("Visit Support Page")
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.caption)
                     }
-                    .padding(.vertical, 8)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
                 }
+                .padding(.horizontal)
 
-                Section(header: Text("Support")) {
-                    Link(destination: URL(string: "https://github.com/jvm986/RumTime")!) {
-                        HStack {
-                            Image(systemName: "questionmark.circle")
-                            Text("Visit Support Page")
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .font(.caption)
-                        }
-                    }
-                }
+                Spacer()
+                    .frame(height: 40)
             }
-            .navigationTitle("Help")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
+            .padding()
         }
+        .navigationTitle("Help")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -121,7 +98,7 @@ struct HelpItem: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundColor(.accentColor)
+                .foregroundColor(Theme.saffron.mainColor)
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 4) {

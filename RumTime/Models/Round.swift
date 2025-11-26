@@ -119,7 +119,7 @@ final class Round {
                         name: score.playerName,
                         theme: score.playerTheme
                     ),
-                    score: score.score,
+                    score: abs(score.score),
                     isWinner: score.isWinner
                 )
             }

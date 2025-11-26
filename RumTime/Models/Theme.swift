@@ -21,8 +21,8 @@ enum Theme: String, CaseIterable, Identifiable, Codable {
 
     var accentColor: Color {
         switch self {
-        case .ash, .biscaygreen, .coralpink, .grapecompote, .lark, .orangepeel, .saffron: return .black
-        case .chive, .classicblue, .navyblazer: return .white
+        case .ash, .biscaygreen, .coralpink, .lark, .orangepeel, .saffron: return .black
+        case .chive, .classicblue, .navyblazer, .grapecompote: return .white
         }
     }
     var mainColor: Color {

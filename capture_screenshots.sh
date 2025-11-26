@@ -4,6 +4,28 @@
 
 # set -e  # Disabled to see errors
 
+# Parse command line arguments
+SKIP_CLEANUP=false
+SKIP_TESTS=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --skip-cleanup)
+            SKIP_CLEANUP=true
+            shift
+            ;;
+        --skip-tests)
+            SKIP_TESTS=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--skip-cleanup] [--skip-tests]"
+            exit 1
+            ;;
+    esac
+done
+
 # Output directory
 SCREENSHOTS_DIR="AppStoreScreenshots"
 mkdir -p "$SCREENSHOTS_DIR"
@@ -17,32 +39,39 @@ DEVICES=(
     "iPad Pro 13-inch (M5)|iPad_13.0|2064|2752"
 )
 
-echo "🎬 Starting screenshot capture process..."
+echo "Starting screenshot capture process..."
 echo ""
 
-for device_config in "${DEVICES[@]}"; do
-    IFS='|' read -r device folder target_width target_height <<< "$device_config"
-
-    echo "📱 Capturing screenshots for: $device"
-    echo "   Output folder: $SCREENSHOTS_DIR/$folder"
-
-    # Create output directory
-    mkdir -p "$SCREENSHOTS_DIR/$folder"
-
-    # Run the screenshot test
-    xcodebuild test \
-        -scheme RumTime \
-        -destination "platform=iOS Simulator,name=$device" \
-        -only-testing:RumTimeUITests/ScreenshotTests/testCaptureScreenshots \
-        -resultBundlePath "$SCREENSHOTS_DIR/${folder}_result.xcresult" \
-        2>&1 | grep -E "(Testing|Executed|FAILED)" || true
-
-    echo "✅ Test completed for $device"
+if [ "$SKIP_TESTS" = true ]; then
+    echo "Skipping tests (using existing xcresult bundles)"
     echo ""
-done
+else
+    for device_config in "${DEVICES[@]}"; do
+        IFS='|' read -r device folder target_width target_height <<< "$device_config"
+
+        echo "Capturing screenshots for: $device"
+        echo "   Output folder: $SCREENSHOTS_DIR/$folder"
+
+        # Create output directory
+        mkdir -p "$SCREENSHOTS_DIR/$folder"
+
+        # Run the screenshot test
+        xcodebuild test \
+            -project RumTime.xcodeproj \
+            -scheme RumTime \
+            -testPlan RumTimeUITests \
+            -destination "platform=iOS Simulator,name=$device" \
+            -only-testing:RumTimeUITests/RumTimeUITests/testCompleteGameFlowWithScreenshots \
+            -resultBundlePath "$SCREENSHOTS_DIR/${folder}_result.xcresult" \
+            2>&1 | grep -E "(Testing|Executed|FAILED)" || true
+
+        echo "Test completed for $device"
+        echo ""
+    done
+fi
 
 echo ""
-echo "🖼️  Extracting screenshots from test results..."
+echo "Extracting screenshots from test results..."
 echo ""
 
 # Extract screenshots from xcresult bundles
@@ -52,17 +81,37 @@ for device_config in "${DEVICES[@]}"; do
     RESULT_BUNDLE="$SCREENSHOTS_DIR/${folder}_result.xcresult"
 
     if [ -d "$RESULT_BUNDLE" ]; then
-        echo "📂 Processing: $folder"
+        echo "Processing: $folder"
 
-        # Find all PNG files in the xcresult bundle and copy them
-        counter=1
-        while IFS= read -r file; do
-            if file "$file" 2>/dev/null | grep -q "PNG image"; then
-                echo "   Copying screenshot: $(basename "$file") (Created: $(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S.%N" "$file"))"
-                cp "$file" "$SCREENSHOTS_DIR/$folder/screenshot-$counter.png"
-                counter=$((counter + 1))
-            fi
-        done < <(find "$RESULT_BUNDLE" -type f)
+        # Export attachments using xcresulttool
+        TEMP_EXPORT_DIR="$SCREENSHOTS_DIR/${folder}_temp"
+        mkdir -p "$TEMP_EXPORT_DIR"
+
+        xcrun xcresulttool export attachments \
+            --path "$RESULT_BUNDLE" \
+            --output-path "$TEMP_EXPORT_DIR" 2>/dev/null
+
+        # Parse manifest.json to get proper screenshot names
+        if [ -f "$TEMP_EXPORT_DIR/manifest.json" ]; then
+            # Extract attachments info and copy with clean names
+            # Parse JSON to get exportedFileName and suggestedHumanReadableName pairs
+            while read -r exported_file suggested_name; do
+                if [ -n "$exported_file" ] && [ -n "$suggested_name" ]; then
+                    # Extract clean name by removing _0_UUID suffix
+                    clean_name=$(echo "$suggested_name" | sed 's/_0_[A-F0-9-]*\.png/.png/')
+
+                    if [ -f "$TEMP_EXPORT_DIR/$exported_file" ]; then
+                        echo "   Copying: $clean_name"
+                        cp "$TEMP_EXPORT_DIR/$exported_file" "$SCREENSHOTS_DIR/$folder/$clean_name"
+                    fi
+                fi
+            done < <(grep -E '"(exportedFileName|suggestedHumanReadableName)"' "$TEMP_EXPORT_DIR/manifest.json" | \
+                     sed 's/.*: "\(.*\)".*/\1/' | \
+                     paste -d' ' - -)
+        fi
+
+        # Clean up temp export directory
+        rm -rf "$TEMP_EXPORT_DIR"
 
         # Count how many screenshots we extracted
         png_count=$(ls -1 "$SCREENSHOTS_DIR/$folder"/*.png 2>/dev/null | wc -l | tr -d ' ')
@@ -78,14 +127,18 @@ for device_config in "${DEVICES[@]}"; do
         echo "   ✓ Resized all screenshots"
 
         # Clean up the xcresult bundle
-        echo "   Cleaning up test results..."
-        rm -rf "$RESULT_BUNDLE"
+        if [ "$SKIP_CLEANUP" = true ]; then
+            echo "   Skipping cleanup (xcresult bundle preserved)"
+        else
+            echo "   Cleaning up test results..."
+            rm -rf "$RESULT_BUNDLE"
+        fi
     fi
 done
 
 echo ""
-echo "✨ Screenshot capture complete!"
+echo "Screenshot capture complete!"
 echo ""
-echo "📁 Screenshots saved to: $SCREENSHOTS_DIR/"
-echo "📱 All screenshots resized to App Store requirements"
+echo "Screenshots saved to: $SCREENSHOTS_DIR/"
+echo "All screenshots resized to App Store requirements"
 echo ""

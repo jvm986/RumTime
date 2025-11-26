@@ -28,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4B08B4AD2ED5EE2F00DC32B5 /* RumTimeUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RumTimeUITests.xctestplan; sourceTree = "<group>"; };
 		4B28263E2ECF0966006F6FAC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4B8E00B32ECE62F800AE3458 /* RumTime.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RumTime.xctestplan; sourceTree = "<group>"; };
 		4BF1AF6B2ECE60E90076BFD9 /* RumTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RumTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +95,7 @@
 		4BF1AF622ECE60E90076BFD9 = {
 			isa = PBXGroup;
 			children = (
+				4B08B4AD2ED5EE2F00DC32B5 /* RumTimeUITests.xctestplan */,
 				4B28263E2ECF0966006F6FAC /* README.md */,
 				4B8E00B32ECE62F800AE3458 /* RumTime.xctestplan */,
 				4BF1AF6D2ECE60E90076BFD9 /* RumTime */,

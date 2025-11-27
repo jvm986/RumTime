@@ -208,14 +208,14 @@ struct DetailView: View {
                 }) {
                     if playerSortMode == .byOrder {
                         ForEach(sortedPlayers) { playerData in
-                            Button {
-                                if isNewGame || !roundTimer.isActive {
-                                    if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                        editingPlayerIndex = index
+                            HStack {
+                                Button {
+                                    if isNewGame || !roundTimer.isActive {
+                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                            editingPlayerIndex = index
+                                        }
                                     }
-                                }
-                            } label: {
-                                HStack {
+                                } label: {
                                     ZStack {
                                         Circle()
                                             .fill(playerData.theme.mainColor)
@@ -238,7 +238,17 @@ struct DetailView: View {
                                                 .font(.system(size: 14))
                                         }
                                     }
+                                }
+                                .disabled(roundTimer.isActive)
+                                .buttonStyle(.plain)
 
+                                Button {
+                                    if isNewGame || !roundTimer.isActive {
+                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                            editingPlayerIndex = index
+                                        }
+                                    }
+                                } label: {
                                     HStack(spacing: 6) {
                                         Text(playerData.name)
                                             .foregroundColor(.primary)
@@ -253,31 +263,28 @@ struct DetailView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                     }
+                                }
+                                .disabled(roundTimer.isActive)
+                                .buttonStyle(.plain)
 
-                                    Spacer()
+                                Spacer()
 
-                                    if !isNewGame,
-                                        let player = game.players.first(where: {
-                                            $0.id == playerData.id
-                                        })
-                                    {
-                                        Text("\(player.totalScore()) points")
-                                            .foregroundColor(.secondary)
-                                    }
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
+                                if !isNewGame,
+                                    let player = game.players.first(where: {
+                                        $0.id == playerData.id
+                                    })
+                                {
+                                    Text("\(player.totalScore()) points")
                                         .foregroundColor(.secondary)
                                 }
-                                .opacity(
-                                    !isNewGame
-                                        && game.players.first(where: { $0.id == playerData.id })?
-                                            .isPaused == true
-                                        ? 0.6
-                                        : 1.0
-                                )
                             }
-                            .disabled(roundTimer.isActive)
+                            .opacity(
+                                !isNewGame
+                                    && game.players.first(where: { $0.id == playerData.id })?
+                                        .isPaused == true
+                                    ? 0.6
+                                    : 1.0
+                            )
                         }
                         .onDelete { indices in
                             if isNewGame || !roundTimer.isActive {
@@ -301,14 +308,14 @@ struct DetailView: View {
                         }
                     } else {
                         ForEach(sortedPlayers) { playerData in
-                            Button {
-                                if isNewGame || !roundTimer.isActive {
-                                    if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                        editingPlayerIndex = index
+                            HStack {
+                                Button {
+                                    if isNewGame || !roundTimer.isActive {
+                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                            editingPlayerIndex = index
+                                        }
                                     }
-                                }
-                            } label: {
-                                HStack {
+                                } label: {
                                     ZStack {
                                         Circle()
                                             .fill(playerData.theme.mainColor)
@@ -331,7 +338,17 @@ struct DetailView: View {
                                                 .font(.system(size: 14))
                                         }
                                     }
+                                }
+                                .disabled(roundTimer.isActive)
+                                .buttonStyle(.plain)
 
+                                Button {
+                                    if isNewGame || !roundTimer.isActive {
+                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                            editingPlayerIndex = index
+                                        }
+                                    }
+                                } label: {
                                     HStack(spacing: 6) {
                                         Text(playerData.name)
                                             .foregroundColor(.primary)
@@ -346,31 +363,28 @@ struct DetailView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                     }
+                                }
+                                .disabled(roundTimer.isActive)
+                                .buttonStyle(.plain)
 
-                                    Spacer()
+                                Spacer()
 
-                                    if !isNewGame,
-                                        let player = game.players.first(where: {
-                                            $0.id == playerData.id
-                                        })
-                                    {
-                                        Text("\(player.totalScore()) points")
-                                            .foregroundColor(.secondary)
-                                    }
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
+                                if !isNewGame,
+                                    let player = game.players.first(where: {
+                                        $0.id == playerData.id
+                                    })
+                                {
+                                    Text("\(player.totalScore()) points")
                                         .foregroundColor(.secondary)
                                 }
-                                .opacity(
-                                    !isNewGame
-                                        && game.players.first(where: { $0.id == playerData.id })?
-                                            .isPaused == true
-                                        ? 0.6
-                                        : 1.0
-                                )
                             }
-                            .disabled(roundTimer.isActive)
+                            .opacity(
+                                !isNewGame
+                                    && game.players.first(where: { $0.id == playerData.id })?
+                                        .isPaused == true
+                                    ? 0.6
+                                    : 1.0
+                            )
                         }
                         .onDelete { indices in
                             if isNewGame || !roundTimer.isActive {
@@ -595,7 +609,7 @@ struct DetailView: View {
             }
 
             // Floating Start Round Button
-            if !isNewGame {
+            if !isNewGame && !isNewPlayerFieldFocused {
                 if roundTimer.isActive {
                     Button {
                         roundTimer.unpauseGame()
@@ -607,10 +621,9 @@ struct DetailView: View {
                                 .font(.callout)
                                 .fontWeight(.semibold)
                             Text("•")
-                                .foregroundColor(.secondary)
                             Text(roundTimer.activePlayerObj.name)
                                 .font(.callout)
-                                .foregroundColor(.secondary)
+                                .opacity(0.5)
                         }
                         .padding(.vertical, 14)
                         .padding(.horizontal, 20)
@@ -641,10 +654,9 @@ struct DetailView: View {
                                 .font(.callout)
                                 .fontWeight(.semibold)
                             Text("•")
-                                .foregroundColor(.secondary)
                             Text(game.unpausedPlayers[game.unpausedStarter].name)
                                 .font(.callout)
-                                .foregroundColor(.secondary)
+                                .opacity(0.5)
                         }
                         .padding(.vertical, 14)
                         .padding(.horizontal, 20)

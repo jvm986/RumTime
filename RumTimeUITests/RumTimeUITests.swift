@@ -105,7 +105,7 @@ final class RumTimeUITests: XCTestCase {
 
     private func createGame(name: String, players: [String]) {
         // Find and tap New Game button
-        let newGameButton = app.buttons["New Game"]
+        let newGameButton = app.buttons["Create Game"]
         XCTAssertTrue(newGameButton.waitForExistence(timeout: 5), "New Game button should exist")
         newGameButton.tap()
 

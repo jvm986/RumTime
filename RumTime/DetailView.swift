@@ -417,6 +417,15 @@ struct DetailView: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
+            .safeAreaInset(edge: .bottom) {
+                // Add padding to account for floating button
+                if !isNewGame && !isNewPlayerFieldFocused {
+                    Color.clear.frame(height: 70)
+                } else if isNewPlayerFieldFocused {
+                    Color.clear.frame(height: 40)
+                }
+            }
             .navigationTitle(isNewGame ? "New Game" : "")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(roundTimer.isActive && !isNewGame)
@@ -765,6 +774,7 @@ struct ColorPickerSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+            .interactiveDismissDisabled(playerName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
     }
 }

@@ -12,10 +12,12 @@ struct PlayerArc: Shape {
     let timeRemaining: Double
 
     private var endAngle: Angle {
-        if timeRemaining / Double(startingTime) * 360.0 < 2 {
+        let calculatedAngle = timeRemaining / Double(startingTime) * 360.0
+        if calculatedAngle < 2 {
             return Angle(degrees: 0)
         }
-        return Angle(degrees: (timeRemaining / Double(startingTime) * 360.0) - 2)
+        // Cap at 358 degrees to always leave a 2-degree gap, even when at or over starting time
+        return Angle(degrees: min(358.0, calculatedAngle - 2))
     }
     
     private var startAngle: Angle {
@@ -26,7 +28,7 @@ struct PlayerArc: Shape {
     }
 
     func path(in rect: CGRect) -> Path {
-        let diameter = min(rect.size.width, rect.size.height) - 24.0
+        let diameter = min(rect.size.width, rect.size.height)
         let radius = diameter / 2.0
         let center = CGPoint(x: rect.midX, y: rect.midY)
         return Path { path in

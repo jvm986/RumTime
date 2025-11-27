@@ -14,6 +14,8 @@ struct GamesView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isPresentingNewGameView = false
     @State private var newGameData = Game.Data()
+    @State private var showingHelp = false
+    @State private var showingPrivacyPolicy = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -108,10 +110,30 @@ struct GamesView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: SettingsView()) {
-                    Image(systemName: "gear")
+                Menu {
+                    Button {
+                        showingHelp = true
+                    } label: {
+                        Label("Help", systemImage: "questionmark.circle")
+                    }
+
+                    Button {
+                        showingPrivacyPolicy = true
+                    } label: {
+                        Label("Privacy Policy", systemImage: "hand.raised")
+                    }
+
+                    Divider()
+
+                    let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+                    let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+                    Text("Version \(version) (\(build))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } label: {
+                    Image(systemName: "line.3.horizontal")
                 }
-                .accessibilityLabel("Settings")
+                .accessibilityLabel("Menu")
             }
         }
         .sheet(isPresented: $isPresentingNewGameView) {
@@ -127,6 +149,12 @@ struct GamesView: View {
             .onDisappear {
                 newGameData = Game.Data()
             }
+        }
+        .sheet(isPresented: $showingHelp) {
+            HelpView()
+        }
+        .sheet(isPresented: $showingPrivacyPolicy) {
+            PrivacyPolicyView()
         }
     }
 }

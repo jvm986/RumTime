@@ -101,27 +101,21 @@ struct RoundEditView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        NavigationView {
-            ScoreView(round: $roundData, onDelete: {
+        ScoreView(
+            round: $roundData,
+            onDelete: {
                 modelContext.delete(round)
                 dismiss()
-            })
-            .navigationTitle("Edit Round")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        saveChanges()
-                        dismiss()
-                    }
-                }
-            }
-        }
+            },
+            onRecord: {
+                saveChanges()
+                dismiss()
+            },
+            onBack: {
+                dismiss()
+            },
+            navigationTitle: "Edit Round"
+        )
     }
 
     private func saveChanges() {

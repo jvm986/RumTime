@@ -27,7 +27,7 @@ RumTime does not use any third-party analytics, advertising, or tracking service
 
 You can delete any game data at any time by:
 
-- Swiping left on games or rounds to delete them
+- Deleting players, games or rounds individually within the app
 - Uninstalling the app (removes all local data)
 
 ## Children's Privacy

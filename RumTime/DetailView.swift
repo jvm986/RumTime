@@ -97,6 +97,9 @@ struct DetailView: View {
                                 .fill(gameData.theme.mainColor)
                                 .frame(width: 32, height: 32)
                         }
+                        .accessibilityLabel("Game color")
+                        .accessibilityValue(gameData.theme.name)
+                        .accessibilityHint("Tap to change game color")
                         .disabled(!isNewGame && roundTimer.isActive)
 
                         TextField("Game Name", text: $gameData.name, prompt: Text("Enter game name"))
@@ -104,6 +107,8 @@ struct DetailView: View {
                             .fontWeight(.semibold)
                             .focused($isGameNameFocused)
                             .disabled(!isNewGame && roundTimer.isActive)
+                            .accessibilityLabel("Game name")
+                            .accessibilityHint("Enter a name for this game")
                             .onChange(of: gameData.name) { oldValue, newValue in
                                 if !isNewGame {
                                     game.name = newValue
@@ -120,6 +125,8 @@ struct DetailView: View {
                             Slider(value: $gameData.startingTime, in: 15...300, step: 15) {
                                 Text("Starting Time")
                             }
+                            .accessibilityLabel("Starting time")
+                            .accessibilityValue("\(Int(gameData.startingTime) / 60) minutes and \(Int(gameData.startingTime) % 60) seconds")
                             .accessibilityIdentifier("Starting Time Slider")
                             .disabled(!isNewGame && roundTimer.isActive)
                             .onChange(of: gameData.startingTime) { oldValue, newValue in
@@ -149,6 +156,7 @@ struct DetailView: View {
                             Slider(value: $gameData.turnBonus, in: 1...15, step: 1) {
                                 Text("Turn Bonus")
                             }
+                            .accessibilityLabel("Turn bonus")
                             .accessibilityValue("\(Int(gameData.turnBonus)) seconds")
                             .accessibilityIdentifier("Turn Bonus Slider")
                             .disabled(!isNewGame && roundTimer.isActive)
@@ -173,6 +181,8 @@ struct DetailView: View {
                         Toggle(isOn: $gameData.winnerGetsSumOfLosersScores) {
                             Text("Sum Scoring")
                         }
+                        .accessibilityLabel("Sum scoring")
+                        .accessibilityHint("When enabled, winner scores sum of losers' points")
                         .accessibilityIdentifier("Winner Scoring Toggle")
                         .disabled(!isNewGame && roundTimer.isActive)
                         .onChange(of: gameData.winnerGetsSumOfLosersScores) { oldValue, newValue in
@@ -208,14 +218,14 @@ struct DetailView: View {
                 }) {
                     if playerSortMode == .byOrder {
                         ForEach(sortedPlayers) { playerData in
-                            HStack {
-                                Button {
-                                    if isNewGame || !roundTimer.isActive {
-                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                            editingPlayerIndex = index
-                                        }
+                            Button {
+                                if isNewGame || !roundTimer.isActive {
+                                    if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                        editingPlayerIndex = index
                                     }
-                                } label: {
+                                }
+                            } label: {
+                                HStack {
                                     ZStack {
                                         Circle()
                                             .fill(playerData.theme.mainColor)
@@ -238,17 +248,7 @@ struct DetailView: View {
                                                 .font(.system(size: 14))
                                         }
                                     }
-                                }
-                                .disabled(roundTimer.isActive)
-                                .buttonStyle(.plain)
 
-                                Button {
-                                    if isNewGame || !roundTimer.isActive {
-                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                            editingPlayerIndex = index
-                                        }
-                                    }
-                                } label: {
                                     HStack(spacing: 6) {
                                         Text(playerData.name)
                                             .foregroundColor(.primary)
@@ -263,21 +263,21 @@ struct DetailView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                     }
-                                }
-                                .disabled(roundTimer.isActive)
-                                .buttonStyle(.plain)
 
-                                Spacer()
+                                    Spacer()
 
-                                if !isNewGame,
-                                    let player = game.players.first(where: {
-                                        $0.id == playerData.id
-                                    })
-                                {
-                                    Text("\(player.totalScore()) points")
-                                        .foregroundColor(.secondary)
+                                    if !isNewGame,
+                                        let player = game.players.first(where: {
+                                            $0.id == playerData.id
+                                        })
+                                    {
+                                        Text("\(player.totalScore()) points")
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
+                            .disabled(roundTimer.isActive)
+                            .buttonStyle(.plain)
                             .opacity(
                                 !isNewGame
                                     && game.players.first(where: { $0.id == playerData.id })?
@@ -308,14 +308,14 @@ struct DetailView: View {
                         }
                     } else {
                         ForEach(sortedPlayers) { playerData in
-                            HStack {
-                                Button {
-                                    if isNewGame || !roundTimer.isActive {
-                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                            editingPlayerIndex = index
-                                        }
+                            Button {
+                                if isNewGame || !roundTimer.isActive {
+                                    if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
+                                        editingPlayerIndex = index
                                     }
-                                } label: {
+                                }
+                            } label: {
+                                HStack {
                                     ZStack {
                                         Circle()
                                             .fill(playerData.theme.mainColor)
@@ -338,17 +338,7 @@ struct DetailView: View {
                                                 .font(.system(size: 14))
                                         }
                                     }
-                                }
-                                .disabled(roundTimer.isActive)
-                                .buttonStyle(.plain)
 
-                                Button {
-                                    if isNewGame || !roundTimer.isActive {
-                                        if let index = gameData.players.firstIndex(where: { $0.id == playerData.id }) {
-                                            editingPlayerIndex = index
-                                        }
-                                    }
-                                } label: {
                                     HStack(spacing: 6) {
                                         Text(playerData.name)
                                             .foregroundColor(.primary)
@@ -363,21 +353,21 @@ struct DetailView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                     }
-                                }
-                                .disabled(roundTimer.isActive)
-                                .buttonStyle(.plain)
 
-                                Spacer()
+                                    Spacer()
 
-                                if !isNewGame,
-                                    let player = game.players.first(where: {
-                                        $0.id == playerData.id
-                                    })
-                                {
-                                    Text("\(player.totalScore()) points")
-                                        .foregroundColor(.secondary)
+                                    if !isNewGame,
+                                        let player = game.players.first(where: {
+                                            $0.id == playerData.id
+                                        })
+                                    {
+                                        Text("\(player.totalScore()) points")
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
+                            .disabled(roundTimer.isActive)
+                            .buttonStyle(.plain)
                             .opacity(
                                 !isNewGame
                                     && game.players.first(where: { $0.id == playerData.id })?
@@ -405,6 +395,8 @@ struct DetailView: View {
                         TextField("New Player", text: $editPlayerName)
                             .focused($isNewPlayerFieldFocused)
                             .disabled(!isNewGame && roundTimer.isActive)
+                            .accessibilityLabel("New player name")
+                            .accessibilityHint("Enter a name and tap the plus button to add a player")
                             .onSubmit {
                                 addPlayer()
                             }
@@ -413,6 +405,7 @@ struct DetailView: View {
                             Image(systemName: "plus.circle.fill")
                                 .accessibilityLabel("Add player")
                         }
+                        .accessibilityHint("Adds the player to the game")
                         .disabled(editPlayerName.isEmpty || (!isNewGame && roundTimer.isActive))
                     }
                 }
@@ -642,6 +635,8 @@ struct DetailView: View {
                         )
                         .foregroundColor(roundTimer.activeTheme.accentColor)
                     }
+                    .accessibilityLabel("Resume Round for \(roundTimer.activePlayerObj.name)")
+                    .accessibilityHint("Continues the paused round timer")
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                 } else if !game.unpausedPlayers.isEmpty
@@ -675,6 +670,8 @@ struct DetailView: View {
                         )
                         .foregroundColor(game.unpausedPlayers[game.unpausedStarter].theme.accentColor)
                     }
+                    .accessibilityLabel("Start Round with \(game.unpausedPlayers[game.unpausedStarter].name)")
+                    .accessibilityHint("Begins a new round with the timer")
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                 }
@@ -718,7 +715,10 @@ struct ColorPickerSheet: View {
                         .fontWeight(.semibold)
                         .multilineTextAlignment(.center)
                         .textFieldStyle(.plain)
+                        .accessibilityLabel("Player name")
+                        .accessibilityHint("Edit the player's name")
                         .padding(.top, 8)
+                        .accessibilityIdentifier("Player Name Field")
 
                     // Color Selection
                     LazyVGrid(columns: columns, spacing: 20) {
@@ -739,6 +739,8 @@ struct ColorPickerSheet: View {
                                     }
                                 }
                             }
+                            .accessibilityLabel(theme.name)
+                            .accessibilityAddTraits(selectedColor == theme ? [.isButton, .isSelected] : .isButton)
                         }
                     }
                     .padding(.horizontal, 24)
@@ -756,6 +758,8 @@ struct ColorPickerSheet: View {
                                         .font(.body)
                                 }
                             }
+                            .accessibilityLabel("Sitting out")
+                            .accessibilityHint("When enabled, this player will not participate in rounds")
                             .disabled(!canTogglePause)
 
                             if !canTogglePause {
@@ -794,6 +798,7 @@ struct ThemePickerSheet: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                         .padding(.top, 8)
+                        .accessibilityIdentifier("Game Color Title")
 
                     // Color Selection
                     LazyVGrid(columns: columns, spacing: 20) {
@@ -814,6 +819,8 @@ struct ThemePickerSheet: View {
                                     }
                                 }
                             }
+                            .accessibilityLabel(theme.name)
+                            .accessibilityAddTraits(selectedTheme == theme ? [.isButton, .isSelected] : .isButton)
                         }
                     }
                     .padding(.horizontal, 24)

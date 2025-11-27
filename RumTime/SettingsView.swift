@@ -50,6 +50,8 @@ struct SettingsView: View {
                         Text(appVersion)
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Version \(appVersion)")
                 } header: {
                     Text("About")
                 }

@@ -85,6 +85,7 @@ struct PrivacyPolicyView: View {
                             destination: URL(string: "https://github.com/jvm986/RumTime")!
                         )
                         .font(.footnote)
+                        .accessibilityAddTraits(.isLink)
                     }
                 }
                 .padding()

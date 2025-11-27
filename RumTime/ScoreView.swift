@@ -95,10 +95,11 @@ struct ScoreView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if let onDelete = onDelete {
-                        Button("Delete", role: .destructive) {
+                        Button("Cancel", role: .destructive) {
                             onDelete()
                         }
                         .foregroundColor(.red)
+                        .accessibilityHint(onResume == nil ? "Delete the round" : "Cancel the round")
                     }
                 }
             }
@@ -124,6 +125,7 @@ struct ScoreView: View {
                     )
                     .foregroundColor(winnerTheme.accentColor)
                 }
+                .accessibilityHint(onResume == nil ? "Saves changes to the round" : "Records the round and returns to the game")
                 .padding(.horizontal)
                 .padding(.bottom, 16)
             }

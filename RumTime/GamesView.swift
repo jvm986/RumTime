@@ -10,8 +10,16 @@ import SwiftUI
 
 struct GamesView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Game.name) private var games: [Game]
+    @Query private var allGames: [Game]
     @Environment(\.scenePhase) private var scenePhase
+
+    private var games: [Game] {
+        allGames.sorted { game1, game2 in
+            let date1 = game1.lastPlayedDate
+            let date2 = game2.lastPlayedDate
+            return date1 > date2
+        }
+    }
     @State private var isPresentingNewGameView = false
     @State private var newGameData = Game.Data()
     @State private var showingHelp = false
@@ -99,6 +107,7 @@ struct GamesView: View {
                             .fill(Color.saffron)
                     )
             }
+            .accessibilityHint("Opens a form to create a new game")
             .padding(.horizontal)
             .padding(.bottom, 16)
         }

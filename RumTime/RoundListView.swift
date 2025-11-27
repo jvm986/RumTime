@@ -38,6 +38,7 @@ struct RoundListView: View {
 
                                     HStack(spacing: 4) {
                                         Image(systemName: "trophy.fill")
+                                            .accessibilityHidden(true)
                                         Text(round.winner.playerName)
                                     }
                                     .font(.caption)
@@ -49,10 +50,13 @@ struct RoundListView: View {
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                    .accessibilityHidden(true)
                             }
                             .padding(.vertical, 4)
                             .contentShape(Rectangle())
                         }
+                        .accessibilityLabel("Round from \(round.date.formatted(date: .abbreviated, time: .shortened)), won by \(round.winner.playerName)")
+                        .accessibilityHint("Tap to edit this round")
                         .buttonStyle(.plain)
                     }
                 }

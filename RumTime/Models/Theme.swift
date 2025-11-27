@@ -9,7 +9,6 @@ import SwiftUI
 
 enum Theme: String, CaseIterable, Identifiable, Codable {
     case ash
-    case biscaygreen
     case chive
     case classicblue
     case coralpink
@@ -18,10 +17,11 @@ enum Theme: String, CaseIterable, Identifiable, Codable {
     case navyblazer
     case orangepeel
     case saffron
+    case sunlight
 
     var accentColor: Color {
         switch self {
-        case .ash, .biscaygreen, .coralpink, .lark, .orangepeel, .saffron: return .black
+        case .ash, .coralpink, .lark, .orangepeel, .saffron, .sunlight: return .black
         case .chive, .classicblue, .navyblazer, .grapecompote: return .white
         }
     }

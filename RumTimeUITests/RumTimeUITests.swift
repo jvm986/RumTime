@@ -27,30 +27,27 @@ final class RumTimeUITests: XCTestCase {
     @MainActor
     func testCompleteGameFlowWithScreenshots() throws {
         dismissWelcomeScreenIfPresent()
-
-        let settingsButton = app.buttons["Settings"].firstMatch
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2), "Settings button should exist")
-        settingsButton.tap()
-
-        let helpButton = app.buttons["Help"]
-        XCTAssertTrue(helpButton.waitForExistence(timeout: 2), "Help button should exist")
-        helpButton.tap()
-        XCTAssertTrue(app.staticTexts["Help"].waitForExistence(timeout: 2), "Help screen should appear")
-        takeScreenshot(named: "05-help-screen")
-
-        let helpBackButton = app.navigationBars.buttons.element(boundBy: 0)
-        XCTAssertTrue(helpBackButton.exists, "Back button should exist")
-        helpBackButton.tap()
-
-        let gamesButton = app.buttons["Games"].firstMatch
-        XCTAssertTrue(gamesButton.waitForExistence(timeout: 2), "Games button should exist")
-        gamesButton.tap()
         
         cleanupTestGames()
 
-        createGame(name: "Family Night", players: ["Alice", "Bob", "Charlie"])
-        createGame(name: "Tournament", players: ["Diana", "Eve", "Frank", "Grace"])
-        createGame(name: "Quick Game", players: ["Henry", "Iris"])
+        createGame(
+            name: "Family Night",
+            players: ["Alice", "Bob", "Charlie"],
+            gameTheme: "Classicblue",
+            playerThemes: ["Saffron", "Coralpink", "Ash"]
+        )
+        createGame(
+            name: "Tournament",
+            players: ["Diana", "Eve", "Frank", "Grace"],
+            gameTheme: "Chive",
+            playerThemes: ["Sunlight", "Saffron", "Coralpink", "Ash"]
+        )
+        createGame(
+            name: "Quick Game",
+            players: ["Henry", "Iris"],
+            gameTheme: "Grapecompote",
+            playerThemes: ["Saffron", "Coralpink"]
+        )
 
         let firstGame = app.staticTexts["Family Night"]
         XCTAssertTrue(firstGame.waitForExistence(timeout: 10), "First game should appear in list")
@@ -69,7 +66,7 @@ final class RumTimeUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Record Scores"].waitForExistence(timeout: 10), "Score screen should appear")
         takeScreenshot(named: "03-score-entry")
 
-        let recordButton = app.buttons["Record"]
+        let recordButton = app.buttons["Record Round"]
         XCTAssertTrue(recordButton.waitForExistence(timeout: 3), "Record button should exist")
         recordButton.tap()
 
@@ -79,6 +76,24 @@ final class RumTimeUITests: XCTestCase {
         gameBackButton.tap()
         XCTAssertTrue(app.staticTexts["Family Night"].waitForExistence(timeout: 10), "Should return to games list")
 
+        let menuButton = app.buttons["Menu"].firstMatch
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 2), "Menu button should exist")
+        menuButton.tap()
+
+        let helpButton = app.buttons["Help"]
+        XCTAssertTrue(helpButton.waitForExistence(timeout: 2), "Help button should exist")
+        helpButton.tap()
+        XCTAssertTrue(app.navigationBars["Help"].waitForExistence(timeout: 2), "Help screen should appear")
+        takeScreenshot(named: "05-help-screen")
+
+        // Dismiss help sheet by tapping back button
+        let helpBackButton = app.buttons["Help Back Button"]
+        XCTAssertTrue(helpBackButton.waitForExistence(timeout: 2), "Help back button should exist")
+        helpBackButton.tap()
+
+        // Wait for sheet to dismiss and games list to be visible again
+        XCTAssertTrue(app.buttons["Menu"].waitForExistence(timeout: 3), "Should return to games list")
+        
         cleanupTestGames()
 
         XCTAssertFalse(app.staticTexts["Family Night"].exists, "Family Night should be deleted")
@@ -103,7 +118,7 @@ final class RumTimeUITests: XCTestCase {
         }
     }
 
-    private func createGame(name: String, players: [String]) {
+    private func createGame(name: String, players: [String], gameTheme: String? = nil, playerThemes: [String] = []) {
         // Find and tap New Game button
         let newGameButton = app.buttons["Create Game"]
         XCTAssertTrue(newGameButton.waitForExistence(timeout: 5), "New Game button should exist")
@@ -113,21 +128,56 @@ final class RumTimeUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["New Game"].waitForExistence(timeout: 10), "New Game screen should appear")
 
         let nameField = app.textFields["Enter game name"]
+
+        // Select game theme if specified
+        if let gameTheme = gameTheme {
+            let gameColorButton = app.buttons["Game color"]
+            XCTAssertTrue(gameColorButton.waitForExistence(timeout: 2), "Game color button should exist")
+            gameColorButton.tap()
+
+            let themeButton = app.buttons[gameTheme]
+            XCTAssertTrue(themeButton.waitForExistence(timeout: 2), "Theme button \(gameTheme) should exist")
+            themeButton.tap()
+
+            // Dismiss sheet by tapping on the navigation bar
+            let navBar = app.navigationBars["New Game"]
+            navBar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+            // Wait for sheet to dismiss
+            sleep(1)
+        }
+
         XCTAssertTrue(nameField.waitForExistence(timeout: 2), "Name field should exist")
         nameField.typeText(name)
-        
+
 
         // Add players
         let playerField = app.textFields["New Player"]
         let addButton = app.buttons["Add player"]
 
-        for player in players {
+        for (index, player) in players.enumerated() {
             XCTAssertTrue(playerField.waitForExistence(timeout: 5), "Player field should exist for \(player)")
             playerField.tap()
             playerField.typeText(player)
 
             XCTAssertTrue(addButton.waitForExistence(timeout: 3), "Add button should exist")
             addButton.tap()
+
+            // Select player theme if specified
+            if index < playerThemes.count {
+                // Tap on the player name text to open color picker
+                let playerNameText = app.staticTexts[player]
+                XCTAssertTrue(playerNameText.waitForExistence(timeout: 3), "Player name \(player) should exist")
+                playerNameText.tap()
+
+                let themeButton = app.buttons[playerThemes[index]]
+                XCTAssertTrue(themeButton.waitForExistence(timeout: 2), "Theme button \(playerThemes[index]) should exist")
+                themeButton.tap()
+
+                // Dismiss sheet by tapping on the navigation bar
+                let navBar = app.navigationBars["New Game"]
+                navBar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            }
         }
 
         // Create game

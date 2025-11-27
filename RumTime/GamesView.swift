@@ -99,6 +99,7 @@ struct GamesView: View {
                             .fill(Color.saffron)
                     )
             }
+            .accessibilityHint("Opens a form to create a new game")
             .padding(.horizontal)
             .padding(.bottom, 16)
         }

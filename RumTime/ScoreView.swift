@@ -124,6 +124,7 @@ struct ScoreView: View {
                     )
                     .foregroundColor(winnerTheme.accentColor)
                 }
+                .accessibilityHint(onResume == nil ? "Saves changes to the round" : "Records the round and returns to the game")
                 .padding(.horizontal)
                 .padding(.bottom, 16)
             }

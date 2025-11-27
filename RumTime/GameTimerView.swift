@@ -14,6 +14,16 @@ struct GameTimerView: View {
     let currentPlayer: String
     let theme: Theme
 
+    private func timeRemainingDescription(_ seconds: Double) -> String {
+        let mins = Int(seconds) / 60
+        let secs = Int(seconds) % 60
+        if mins > 0 {
+            return "\(mins) minute\(mins == 1 ? "" : "s") and \(secs) second\(secs == 1 ? "" : "s")"
+        } else {
+            return "\(secs) second\(secs == 1 ? "" : "s")"
+        }
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
@@ -24,6 +34,7 @@ struct GameTimerView: View {
                 Circle()
                     .strokeBorder(lineWidth: strokeWidth)
                     .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
+                    .accessibilityHidden(true)
 
                 TimeView(totalSeconds: timeRemaining)
                     .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
@@ -33,9 +44,13 @@ struct GameTimerView: View {
                     .rotation(Angle(degrees: -90))
                     .stroke(timeRemaining > 15 ? theme.mainColor: .red, style: StrokeStyle(lineWidth: arcWidth, lineCap: .round))
                     .padding(strokeWidth / 2)
+                    .accessibilityHidden(true)
             }
             .frame(width: size, height: size)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(currentPlayer)'s turn")
+            .accessibilityValue(timeRemainingDescription(timeRemaining))
         }
     }
 }

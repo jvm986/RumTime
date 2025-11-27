@@ -28,23 +28,23 @@ final class RumTimeUITests: XCTestCase {
     func testCompleteGameFlowWithScreenshots() throws {
         dismissWelcomeScreenIfPresent()
 
-        let settingsButton = app.buttons["Settings"].firstMatch
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2), "Settings button should exist")
-        settingsButton.tap()
+        let menuButton = app.buttons["Menu"].firstMatch
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 2), "Menu button should exist")
+        menuButton.tap()
 
         let helpButton = app.buttons["Help"]
         XCTAssertTrue(helpButton.waitForExistence(timeout: 2), "Help button should exist")
         helpButton.tap()
-        XCTAssertTrue(app.staticTexts["Help"].waitForExistence(timeout: 2), "Help screen should appear")
+        XCTAssertTrue(app.navigationBars["Help"].waitForExistence(timeout: 2), "Help screen should appear")
         takeScreenshot(named: "05-help-screen")
 
-        let helpBackButton = app.navigationBars.buttons.element(boundBy: 0)
-        XCTAssertTrue(helpBackButton.exists, "Back button should exist")
+        // Dismiss help sheet by tapping back button
+        let helpBackButton = app.buttons["Help Back Button"]
+        XCTAssertTrue(helpBackButton.waitForExistence(timeout: 2), "Help back button should exist")
         helpBackButton.tap()
 
-        let gamesButton = app.buttons["Games"].firstMatch
-        XCTAssertTrue(gamesButton.waitForExistence(timeout: 2), "Games button should exist")
-        gamesButton.tap()
+        // Wait for sheet to dismiss and games list to be visible again
+        XCTAssertTrue(app.buttons["Menu"].waitForExistence(timeout: 3), "Should return to games list")
         
         cleanupTestGames()
 
@@ -69,7 +69,7 @@ final class RumTimeUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Record Scores"].waitForExistence(timeout: 10), "Score screen should appear")
         takeScreenshot(named: "03-score-entry")
 
-        let recordButton = app.buttons["Record"]
+        let recordButton = app.buttons["Record Round"]
         XCTAssertTrue(recordButton.waitForExistence(timeout: 3), "Record button should exist")
         recordButton.tap()
 

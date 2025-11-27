@@ -27,27 +27,32 @@ struct TimeView: View {
     var numWidth: Double = 0.23
     var numSpacing: Double = 0.05
     var puncSpacing: Double = 0.25
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 HStack(spacing: geometry.size.width * numSpacing) {
                     Text(String(format: "%02i", minutes))
-                        .font(.system(size: geometry.size.width * numWidth))
+                        .font(.system(size: geometry.size.width * numWidth, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .frame(width: geometry.size.width * 0.3)
                     Text(String(format: "%02i", seconds))
-                        .font(.system(size: geometry.size.width * numWidth))
+                        .font(.system(size: geometry.size.width * numWidth, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .frame(width: geometry.size.width * 0.3)
                     Text(String(format: "%02i", milliseconds))
-                        .font(.system(size: geometry.size.width * numWidth))
+                        .font(.system(size: geometry.size.width * numWidth, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .frame(width: geometry.size.width * 0.3)
                 }
                 HStack(spacing: geometry.size.width * puncSpacing) {
                     Text(":")
-                        .font(.system(size: geometry.size.width * numWidth))
+                        .font(.system(size: geometry.size.width * numWidth, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .frame(width: geometry.size.width * 0.1)
                     Text(".")
-                        .font(.system(size: geometry.size.width * numWidth))
+                        .font(.system(size: geometry.size.width * numWidth, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .frame(width: geometry.size.width * 0.1)
                 }
             }

@@ -87,6 +87,7 @@ struct HelpView: View {
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                     }
+                    .accessibilityAddTraits(.isLink)
                     .padding(.horizontal)
 
                     Spacer()
@@ -103,6 +104,8 @@ struct HelpView: View {
                     } label: {
                         Image(systemName: "chevron.left")
                     }
+                    .accessibilityIdentifier("Help Back Button")
+                    .accessibilityLabel("Back")
                 }
             }
         }

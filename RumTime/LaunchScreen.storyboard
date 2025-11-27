@@ -19,6 +19,7 @@
                                 <rect key="frame" x="49.25" y="326" width="294.5" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Xfz-8Y-fLl" secondAttribute="height" multiplier="1:1" id="aspect-ratio"/>
+                                    <constraint firstAttribute="width" constant="300" id="fixed-width"/>
                                 </constraints>
                             </imageView>
                         </subviews>
@@ -27,7 +28,6 @@
                         <constraints>
                             <constraint firstItem="Xfz-8Y-fLl" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="R0S-yp-MmZ"/>
                             <constraint firstItem="Xfz-8Y-fLl" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="gPX-5K-h2e"/>
-                            <constraint firstItem="Xfz-8Y-fLl" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.75" id="width-constraint"/>
                         </constraints>
                     </view>
                 </viewController>

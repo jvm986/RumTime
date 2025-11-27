@@ -95,11 +95,11 @@ struct ScoreView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if let onDelete = onDelete {
-                        Button("Cancel", role: .destructive) {
+                        Button(onResume == nil ? "Delete" : "Reset", role: .destructive) {
                             onDelete()
                         }
                         .foregroundColor(.red)
-                        .accessibilityHint(onResume == nil ? "Delete the round" : "Cancel the round")
+                        .accessibilityHint(onResume == nil ? "Delete the round" : "Reset the round")
                     }
                 }
             }

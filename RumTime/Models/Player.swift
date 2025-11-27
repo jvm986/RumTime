@@ -18,6 +18,7 @@ final class Player {
     var name: String
     var themeRawValue: String
     var isPaused: Bool
+    var sortOrder: Int
 
     /// Parent relationship to the game this player belongs to
     @Relationship(inverse: \Game.players) var game: Game?
@@ -28,11 +29,12 @@ final class Player {
         set { themeRawValue = newValue.rawValue }
     }
 
-    init(id: UUID = UUID(), name: String, theme: Theme, isPaused: Bool = false) {
+    init(id: UUID = UUID(), name: String, theme: Theme, isPaused: Bool = false, sortOrder: Int = 0) {
         self.id = id
         self.name = name
         self.themeRawValue = theme.rawValue
         self.isPaused = isPaused
+        self.sortOrder = sortOrder
     }
 
     /// Calculates the player's total score across all rounds in their game.

@@ -22,6 +22,7 @@ final class Game {
     var starter: Int
     var winnerGetsSumOfLosersScores: Bool
     var theme: Theme
+    var createdAt: Date
 
     @Relationship(deleteRule: .cascade) var players: [Player]
     @Relationship(deleteRule: .cascade) var rounds: [Round]
@@ -35,7 +36,8 @@ final class Game {
         starter: Int = 0,
         rounds: [Round] = [],
         winnerGetsSumOfLosersScores: Bool = true,
-        theme: Theme = .saffron
+        theme: Theme = .saffron,
+        createdAt: Date = Date()
     ) {
         self.id = id
         self.name = name
@@ -46,15 +48,21 @@ final class Game {
         self.rounds = rounds
         self.winnerGetsSumOfLosersScores = winnerGetsSumOfLosersScores
         self.theme = theme
+        self.createdAt = createdAt
     }
 
     var startingTimeString: String {
         String(format: "%02i:%02i", startingTime / 60 % 60, startingTime % 60)
     }
 
+    /// Returns the date of the most recent round, or the game's creation date if no rounds have been played.
+    var lastPlayedDate: Date {
+        rounds.first?.date ?? createdAt
+    }
+
     /// Returns the index in unpausedPlayers array corresponding to the starter.
     var unpausedStarter: Int {
-        for (idx, p) in players.enumerated() {
+        for (idx, p) in orderedPlayers.enumerated() {
             if idx == starter {
                 for (idx, up) in unpausedPlayers.enumerated() {
                     if p.id == up.id {
@@ -66,14 +74,19 @@ final class Game {
         return 0
     }
 
-    /// Returns players sorted by their total score (highest first).
-    var sortedPlayers: [Player] {
-        players.sorted(by: { $0.totalScore() > $1.totalScore() })
+    /// Returns players in their correct order (by sortOrder).
+    var orderedPlayers: [Player] {
+        players.sorted(by: { $0.sortOrder < $1.sortOrder })
     }
 
-    /// Returns only players who are not paused.
+    /// Returns players sorted by their total score (highest first).
+    var sortedPlayers: [Player] {
+        orderedPlayers.sorted(by: { $0.totalScore() > $1.totalScore() })
+    }
+
+    /// Returns only players who are not paused, in their correct order.
     var unpausedPlayers: [Player] {
-        players.filter { !$0.isPaused }
+        orderedPlayers.filter { !$0.isPaused }
     }
 
     /// Calculates properly scored Score objects from Round.Data.
@@ -224,7 +237,7 @@ final class Game {
             name: name,
             startingTime: Double(startingTime),
             turnBonus: Double(turnBonus),
-            players: players.map { Data.PlayerData(id: $0.id, name: $0.name, theme: $0.theme, isPaused: $0.isPaused) },
+            players: orderedPlayers.map { Data.PlayerData(id: $0.id, name: $0.name, theme: $0.theme, isPaused: $0.isPaused) },
             starter: starter,
             winnerGetsSumOfLosersScores: winnerGetsSumOfLosersScores,
             theme: theme
@@ -239,30 +252,47 @@ final class Game {
         winnerGetsSumOfLosersScores = data.winnerGetsSumOfLosersScores
         theme = data.theme
 
-        // Update existing players or create new ones
-        var updatedPlayers: [Player] = []
-        for playerData in data.players {
+        // Remove players that are no longer in the data
+        let dataPlayerIDs = Set(data.players.map { $0.id })
+        players.removeAll { !dataPlayerIDs.contains($0.id) }
+
+        // Update or add players while maintaining order
+        for (index, playerData) in data.players.enumerated() {
             if let existingPlayer = players.first(where: { $0.id == playerData.id }) {
+                // Update existing player
                 existingPlayer.name = playerData.name
                 existingPlayer.theme = playerData.theme
                 existingPlayer.isPaused = playerData.isPaused
-                updatedPlayers.append(existingPlayer)
+                existingPlayer.sortOrder = index
+
+                // Move to correct position if needed
+                if let currentIndex = players.firstIndex(where: { $0.id == playerData.id }), currentIndex != index {
+                    players.remove(at: currentIndex)
+                    players.insert(existingPlayer, at: min(index, players.count))
+                }
             } else {
-                updatedPlayers.append(playerData.toPlayer())
+                // Add new player at the correct position
+                let newPlayer = playerData.toPlayer()
+                newPlayer.sortOrder = index
+                players.insert(newPlayer, at: min(index, players.count))
             }
         }
-        players = updatedPlayers
         starter = data.starter
     }
 
     /// Convenience initializer from Data object.
     convenience init(data: Data) {
+        let playersWithOrder = data.players.enumerated().map { index, playerData in
+            let player = playerData.toPlayer()
+            player.sortOrder = index
+            return player
+        }
         self.init(
             id: UUID(),
             name: data.name,
             startingTime: Int(data.startingTime),
             turnBonus: Int(data.turnBonus),
-            players: data.players.map { $0.toPlayer() },
+            players: playersWithOrder,
             starter: data.starter,
             winnerGetsSumOfLosersScores: data.winnerGetsSumOfLosersScores,
             theme: data.theme

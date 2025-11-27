@@ -12,6 +12,8 @@ struct ScoreView: View {
     var onDelete: (() -> Void)?
     var onResume: (() -> Void)?
     var onRecord: (() -> Void)?
+    var onBack: (() -> Void)?
+    var navigationTitle: String = "Record Scores"
 
     private var winnerID: Binding<UUID> {
         Binding(
@@ -24,70 +26,106 @@ struct ScoreView: View {
         )
     }
 
+    private var winnerTheme: Theme {
+        round.winner.playerTheme
+    }
+
     var body: some View {
-        NavigationStack {
-            Form {
-            Section(header: Text("Winner")) {
-                Picker("Select Winner", selection: winnerID) {
-                    ForEach(round.scores) { score in
-                        Text(score.playerName)
-                            .tag(score.playerID)
-                    }
-                }
-                .pickerStyle(.menu)
-                .accessibilityLabel("Winner picker")
-            }
+        ZStack(alignment: .bottom) {
+            NavigationStack {
+                Form {
+                Section(header: Text("Winner")) {
+                    HStack {
+                        Image(systemName: "trophy.fill")
+                            .foregroundColor(.orange)
 
-            Section(header: Text("Scores")) {
-                ForEach($round.scores) { $score in
-                    if !score.isWinner {
-                        HStack {
-                            Text(score.playerName)
-                            Spacer()
-                            Picker("", selection: $score.score) {
-                                ForEach(0 ..< 200, id: \.self) {
-                                    Text("\($0) points")
-                                }
+                        Picker("Select Winner", selection: winnerID) {
+                            ForEach(round.scores) { score in
+                                Text(score.playerName)
+                                    .tag(score.playerID)
                             }
-                            .accessibilityLabel("Score for \(score.playerName)")
-                            .accessibilityValue("\(Int(score.score)) points")
                         }
+                        .pickerStyle(.menu)
+                        .tint(.primary)
+                        .accessibilityLabel("Winner picker")
                     }
                 }
-            }
 
-                if let onDelete = onDelete {
-                    Section {
-                        Button(role: .destructive) {
-                            onDelete()
-                        } label: {
+                Section(header: Text("Scores")) {
+                    ForEach($round.scores) { $score in
+                        if !score.isWinner {
                             HStack {
+                                Text(score.playerName)
                                 Spacer()
-                                Label("Delete Round", systemImage: "trash")
-                                    .foregroundColor(.red)
-                                Spacer()
+                                Picker("", selection: $score.score) {
+                                    ForEach(0 ..< 200, id: \.self) {
+                                        Text("\($0) points")
+                                    }
+                                }
+                                .accessibilityLabel("Score for \(score.playerName)")
+                                .accessibilityValue("\(Int(score.score)) points")
                             }
                         }
                     }
                 }
             }
-            .navigationTitle("Record Scores")
+            .safeAreaInset(edge: .bottom) {
+                // Add padding to account for floating button
+                if onRecord != nil {
+                    Color.clear.frame(height: 70)
+                }
+            }
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     if let onResume = onResume {
-                        Button("Resume") {
+                        Button {
                             onResume()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                        }
+                    } else if let onBack = onBack {
+                        Button {
+                            onBack()
+                        } label: {
+                            Image(systemName: "chevron.left")
                         }
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    if let onRecord = onRecord {
-                        Button("Record") {
-                            onRecord()
+                    if let onDelete = onDelete {
+                        Button("Delete", role: .destructive) {
+                            onDelete()
                         }
+                        .foregroundColor(.red)
                     }
                 }
+            }
+        }
+
+            // Floating Record/Save Button
+            if let onRecord = onRecord {
+                Button {
+                    onRecord()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                        Text(onResume == nil ? "Save Round" : "Record Round")
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 20)
+                    .background(
+                        Capsule()
+                            .fill(winnerTheme.mainColor)
+                    )
+                    .foregroundColor(winnerTheme.accentColor)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 16)
             }
         }
     }

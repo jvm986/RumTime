@@ -29,8 +29,7 @@ struct GameTimerView: View {
                     .foregroundColor(timeRemaining > 10 ? theme.accentColor: .black)
                     .padding(size * 0.15)
 
-                Circle()
-                    .trim(from: 0, to: CGFloat(timeRemaining / Double(startingTime)))
+                PlayerArc(startingTime: startingTime, timeRemaining: timeRemaining)
                     .rotation(Angle(degrees: -90))
                     .stroke(timeRemaining > 15 ? theme.mainColor: .red, style: StrokeStyle(lineWidth: arcWidth, lineCap: .round))
                     .padding(strokeWidth / 2)

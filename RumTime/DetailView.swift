@@ -615,14 +615,10 @@ struct DetailView: View {
                         .padding(.vertical, 14)
                         .padding(.horizontal, 20)
                         .background(
-                            ZStack {
-                                Capsule()
-                                    .fill(roundTimer.activeTheme.mainColor)
-                                Capsule()
-                                    .fill(.ultraThinMaterial)
-                            }
+                            Capsule()
+                                .fill(roundTimer.activeTheme.mainColor)
                         )
-                        .foregroundColor(.primary)
+                        .foregroundColor(roundTimer.activeTheme.accentColor)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 16)
@@ -653,15 +649,10 @@ struct DetailView: View {
                         .padding(.vertical, 14)
                         .padding(.horizontal, 20)
                         .background(
-                            ZStack {
-                                Capsule()
-                                    .fill(
-                                        game.unpausedPlayers[game.unpausedStarter].theme.mainColor)
-                                Capsule()
-                                    .fill(.ultraThinMaterial)
-                            }
+                            Capsule()
+                                .fill(game.unpausedPlayers[game.unpausedStarter].theme.mainColor)
                         )
-                        .foregroundColor(.primary)
+                        .foregroundColor(game.unpausedPlayers[game.unpausedStarter].theme.accentColor)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 16)

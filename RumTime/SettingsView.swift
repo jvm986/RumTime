@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct SettingsView: View {
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(version) (\(build))"
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -15,13 +21,23 @@ struct SettingsView: View {
                     NavigationLink {
                         HelpView()
                     } label: {
-                        Label("Help", systemImage: "questionmark.circle.fill")
+                        Label {
+                            Text("Help")
+                        } icon: {
+                            Image(systemName: "questionmark.circle.fill")
+                                .foregroundStyle(.saffron)
+                        }
                     }
 
                     NavigationLink {
                         PrivacyPolicyView()
                     } label: {
-                        Label("Privacy Policy", systemImage: "hand.raised.fill")
+                        Label {
+                            Text("Privacy Policy")
+                        } icon: {
+                            Image(systemName: "hand.raised.fill")
+                                .foregroundStyle(.saffron)
+                        }
                     }
                 } header: {
                     Text("Information")
@@ -31,7 +47,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0")
+                        Text(appVersion)
                             .foregroundColor(.secondary)
                     }
                 } header: {
